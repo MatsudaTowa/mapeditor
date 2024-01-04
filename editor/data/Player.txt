@@ -1,0 +1,123 @@
+#==============================================================================
+#
+# モデル情報[Player.txt]
+# Author : MATSUDA TOWA
+#
+#==============================================================================
+SCRIPT			# この行は絶対消さないこと！
+
+#------------------------------------------------------------------------------
+# 表示するエネミーの配置情報
+#------------------------------------------------------------------------------
+
+# body
+PARTSSET
+	PARENT -1		# 親
+	POSx 0.0		# X
+	POSy 8.0		# Y
+	POSz 0.0		# Z
+	ROTx 0.0		# X
+	ROTy 0.0		# Y
+	ROTz 0.0		# Z
+END_PARTSSET
+
+# face
+PARTSSET
+	PARENT 0		# 親
+	POSx 0.0		# X
+	POSy 20.0		# Y
+	POSz 0.0		# Z
+	ROTx 0			# X
+	ROTy 0			# Y
+	ROTz 0			# Z
+END_PARTSSET
+
+# Larm
+PARTSSET
+	PARENT 0		# 親
+	POSx 7.5		# X
+	POSy 15.0		# Y
+	POSz 0.0		# Z
+	ROTx 0			# X
+	ROTy 0			# Y
+	ROTz 0			# Z
+END_PARTSSET
+
+# Lhand
+PARTSSET
+	PARENT 2		# 親
+	POSx 11.0		# X
+	POSy 0.0		# Y
+	POSz 0.0		# Z
+	ROTx 0			# X
+	ROTy 0			# Y
+	ROTz 0			# Z
+END_PARTSSET
+
+# Rarm
+PARTSSET
+	PARENT 0		# 親
+	POSx -7.5		# X
+	POSy 15.0		# Y
+	POSz 0.0		# Z
+	ROTx 0			# X
+	ROTy 0			# Y
+	ROTz 0			# Z
+END_PARTSSET
+
+# Rhand
+PARTSSET
+	PARENT 4		# 親
+	POSx -11.0		# X
+	POSy 0.0		# Y
+	POSz 0.0		# Z
+	ROTx 0			# X
+	ROTy 0			# Y
+	ROTz 0			# Z
+END_PARTSSET
+
+# Lleg
+PARTSSET
+	PARENT 0		# 親
+	POSx 4.0		# X
+	POSy 5.0		# Y
+	POSz 0.0		# Z
+	ROTx 0			# X
+	ROTy 0			# Y
+	ROTz 0			# Z
+END_PARTSSET
+
+# Lfoot
+PARTSSET
+	PARENT 6		# 親
+	POSx 0.0		# X
+	POSy -10.0		# Y
+	POSz 0.0		# Z
+	ROTx 0			# X
+	ROTy 0			# Y
+	ROTz 0			# Z
+END_PARTSSET
+
+# Rleg
+PARTSSET
+	PARENT 0		# 親
+	POSx -4.0		# X
+	POSy 5.0		# Y
+	POSz 0.0		# Z
+	ROTx 0			# X
+	ROTy 0			# Y
+	ROTz 0			# Z
+END_PARTSSET
+
+# Rfoot
+PARTSSET
+	PARENT 8		# 親
+	POSx 0.0		# X
+	POSy -10.0		# Y
+	POSz 0.0		# Z
+	ROTx 0			# X
+	ROTy 0			# Y
+	ROTz 0			# Z
+END_PARTSSET
+
+END		# この行は絶対消さないこと！
