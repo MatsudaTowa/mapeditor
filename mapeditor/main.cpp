@@ -32,7 +32,12 @@ LPDIRECT3DDEVICE9 g_pD3DDevice = NULL; //Direct3Dデバイスへのポインタ
 LPD3DXFONT g_pFont = NULL; //フォントへのポインタ
 DWORD OldTime = timeGetTime();
 int g_nCntFPS = 0;
-bool g_bWireFrame;
+bool g_bWireFrame; //ワイヤーフレーム
+bool g_bEdit; //エディットしてるか
+int g_nUseModel;
+int g_ModelCnt;
+ModelInfo g_aModelInfo[MAX_MODEL];
+
 //=============================================
 //メイン関数
 //=============================================
@@ -210,7 +215,9 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	g_pD3DDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 	
 	g_bWireFrame = false; //ワイヤーフレームを描画しない
-
+	g_bEdit = false; //エディットをしない
+	g_ModelCnt = 0;
+	g_nUseModel = 0;
 	//キーボードの初期化処理
 	if (FAILED(InitKeyboard(hInstance, hWnd)))
 	{
@@ -239,7 +246,11 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 
 	InitModel();
 
+	LoadModel();
+
 	InitShadow();
+
+	InitEdit();
 
 	D3DXCreateFont(g_pD3DDevice, 18, 0, 0, 0,
 		FALSE, SHIFTJIS_CHARSET,
@@ -276,6 +287,8 @@ void Uninit(void)
 
 	UninitShadow();
 
+	UninitEdit();
+
 	//Direct3Dデバイスの破棄
 	if (g_pD3DDevice != NULL)
 	{
@@ -309,13 +322,25 @@ void Update(void)
 
 	UpdateLight();
 
-	UpdateField();
-	
-	UpdateWall();
+	if (GetKeyboardTrigger(DIK_F2) == true)
+	{
+		g_bEdit = g_bEdit ? false : true;
+	}
 
-	UpdateModel();
+	if (g_bEdit == true)
+	{
+		UpdateEdit();
+	}
+	else
+	{//エディットしてないとき
+		UpdateField();
 
-	UpdateShadow();
+		UpdateWall();
+
+		UpdateModel();
+
+		UpdateShadow();
+	}
 
 	//ワイヤーフレーム切り替え
 	if (GetKeyboardTrigger(DIK_F9) == true)
@@ -349,6 +374,11 @@ void Draw(void)
 	if (SUCCEEDED(g_pD3DDevice->BeginScene()))
 	{
 		SetCamera();
+
+		if (g_bEdit == true)
+		{
+			DrawEdit();
+		}
 
 		DrawField();
 
@@ -475,6 +505,37 @@ void SetTime(DWORD time)
 	//}
 }
 
+//=============================================
+//ロード
+//=============================================
+void LoadModel(void)
+{
+	//ファイルの読み込み
+	FILE* pFile = fopen(MODEL_FILE_BIN, "rb");
+
+	if (pFile != NULL)
+	{
+		//敵の使用してる数の読み込み
+		fread(&g_nUseModel, sizeof(int), 1, pFile);
+
+		//敵の使用数分、敵の読み込み
+		fread(&g_aModelInfo[0], sizeof(ModelInfo), g_nUseModel, pFile);
+
+		//ファイルを閉じる
+		fclose(pFile);
+
+	}
+
+	else
+	{
+		return;
+	}
+
+	for (int nCnt = 0; nCnt < g_nUseModel; nCnt++)
+	{
+		SetModel(g_aModelInfo[nCnt].pos, g_aModelInfo[nCnt].rot, g_aModelInfo[nCnt].nType);
+	}
+}
 
 //=============================================
 //デバイスの取得

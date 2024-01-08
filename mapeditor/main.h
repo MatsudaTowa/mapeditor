@@ -14,6 +14,7 @@
 #include "d3dx9.h" //描画処理に必要
 #include "xaudio2.h"
 #include "Xinput.h"
+#include "model.h"
 
 //ライブラリのリンク
 #pragma comment(lib,"d3d9.lib") //描画処理に必要
@@ -50,12 +51,26 @@ typedef struct
 	D3DXVECTOR2 tex; //テクスチャ
 }VERTEX_3D;
 
+typedef struct
+{
+	D3DXVECTOR3 pos;
+	D3DXVECTOR3 rot;
+	D3DXVECTOR3 move;
+	LPD3DXMESH pMesh;
+	LPD3DXBUFFER pBuffMat;
+	DWORD nNumMat;
+	D3DXMATRIX mtxWorld;
+	ModelType nType;
+	bool bUse;
+}ModelInfo;
+
 //プロトタイプ宣言
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow);
 void Uninit(void);
 void Update(void);
 void Draw(void);
+void LoadModel(void);
 LPDIRECT3DDEVICE9 GetDevice(void);
 LPD3DXFONT GetFont(void);
 void WireFrame(void);

@@ -250,20 +250,20 @@ void SaveModel(void)
 	VERTEX_3D* pVtx;
 	g_pVtxBuffEdit->Lock(0, 0, (void**)&pVtx, 0);
 
-	if (GetKeyboardPress(DIK_I) == true)
+	if (GetKeyboardPress(DIK_W) == true)
 	{
 		g_EditModelInfo[g_nSaveModelCnt].pos.z += MOVE_CURSOR
 			;
 	}
-	if (GetKeyboardPress(DIK_K) == true)
+	if (GetKeyboardPress(DIK_S) == true)
 	{
 		g_EditModelInfo[g_nSaveModelCnt].pos.z -= MOVE_CURSOR;
 	}
-	if (GetKeyboardPress(DIK_J) == true)
+	if (GetKeyboardPress(DIK_A) == true)
 	{
 		g_EditModelInfo[g_nSaveModelCnt].pos.x -= MOVE_CURSOR;
 	}
-	if (GetKeyboardPress(DIK_L) == true)
+	if (GetKeyboardPress(DIK_D) == true)
 	{
 		g_EditModelInfo[g_nSaveModelCnt].pos.x += MOVE_CURSOR;
 	}
