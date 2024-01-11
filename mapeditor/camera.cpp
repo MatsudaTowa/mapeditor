@@ -92,6 +92,17 @@ void UpdateCamera(void)
 			g_Camera.type = CAMERATYPE_DEFAULT;
 		}
 	}
+	if (GetKeyboardTrigger(DIK_F10) == true)
+	{
+		if (g_Camera.type != CAMERATYPE_EDIT)
+		{
+			g_Camera.type = CAMERATYPE_EDIT;
+		}
+		else
+		{
+			g_Camera.type = CAMERATYPE_DEFAULT;
+		}
+	}
 
 #endif // DEBUG
 	if (g_Camera.type == CAMERATYPE_DEFAULT)
@@ -218,7 +229,7 @@ void EditCamera(void)
 {
 	EditModelInfo* pEditModel = GetEditModelinfo();
 
-	g_Camera.posR = pEditModel->pos;
+	g_Camera.posR = pEditModel[0].pos;
 
 	if (GetKeyboardPress(DIK_Q) == true || GetJoypadPress(JOYKEY_X) == true)
 	{
@@ -300,7 +311,7 @@ void DebagCameraPos(void)
 	RECT rect = { 0,0,SCREEN_WIDTH,SCREEN_HEIGHT };
 	char aStr[256];
 
-	sprintf(&aStr[0], "[カメラ情報]\nposV:%f,%f,%f\nposR:%f,%f,%f", g_Camera.posV.x, g_Camera.posV.y, g_Camera.posV.z
+	sprintf(&aStr[0], "\n\n\n\n\n\n[カメラ情報]\nposV:%f,%f,%f\nposR:%f,%f,%f", g_Camera.posV.x, g_Camera.posV.y, g_Camera.posV.z
 		,g_Camera.posR.x, g_Camera.posR.y, g_Camera.posR.z);
 
 	//テキストの描画

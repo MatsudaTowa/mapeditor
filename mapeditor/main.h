@@ -62,6 +62,7 @@ typedef struct
 	D3DXMATRIX mtxWorld;
 	ModelType nType;
 	bool bUse;
+	bool bUseGame;
 }ModelInfo;
 
 //プロトタイプ宣言

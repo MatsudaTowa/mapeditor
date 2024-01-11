@@ -10,7 +10,25 @@
 #include "main.h"
 
 //=============================================
-//構想体の定義
+//エディットのタイプ
+//=============================================
+typedef enum
+{
+	EDITTYPE_MODEL = 0,
+	EDITTYPE_CORRECTIONMODEL,
+	EDITTYPE_MAX,
+}EDITTYPE;
+
+//=============================================
+//モデルエディットの構想体の定義
+//=============================================
+typedef struct
+{
+	EDITTYPE EditType;
+}Edit;
+
+//=============================================
+//モデルエディットの構想体の定義
 //=============================================
 typedef struct
 {
@@ -23,19 +41,18 @@ typedef struct
 	D3DXMATRIX mtxWorld;
 	int nType;
 	bool bUse;
+	bool bUseGame; 
 }EditModelInfo;
-
 
 //プロトタイプ宣言
 void InitEdit(void);
 void UninitEdit(void);
 void UpdateEdit(void);
 void SaveModel(void);
-//void SaveBlock(void);
+void CorrectionModel(void);
 void reSaveModel(void);
-//void reSaveBlock(void);
 void DrawEdit(void);
-//int GetEditSelect(void);
+void DebagEdit(void);
 EditModelInfo* GetEditModelinfo(void);
 //D3DXVECTOR3 GetEditCameraPos(void);
 

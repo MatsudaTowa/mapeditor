@@ -23,14 +23,15 @@
 //グローバル変数
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffEdit = NULL;
 LPDIRECT3DTEXTURE9 g_apTextureEdit[NUM_TYPE_EDIT][NUM_TEXTURE] = {}; //テクスチャポインタ
-EditModelInfo g_EditModelInfo[MAX_MODEL];
+Edit g_Edit; //エディット情報
+EditModelInfo g_EditModelInfo[MAX_MODEL]; //モデルのエディット情報
 
 bool g_bSave = true; //セーブできるか
 int g_nSaveModelCnt;
 int g_nSave;
 float g_fAlpha; //α値
 float g_fFlash; //点滅
-//int g_nEditSelect; //エディットする物の選択
+int g_nEditModelNumber; //追従するカメラの対象
 
 //=============================================
 //モデルの種類
@@ -51,6 +52,7 @@ void InitEdit(void)
 	//デバイスの取得
 	pDevice = GetDevice();
 
+	g_Edit.EditType = EDITTYPE_MODEL;
 
 	for (int nCnt = 0; nCnt < NUM_MODEL; nCnt++)
 	{
@@ -86,6 +88,7 @@ void InitEdit(void)
 	g_EditModelInfo[0].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	g_EditModelInfo[0].nType = 0;
 	g_EditModelInfo[0].bUse = true;
+	g_EditModelInfo[0].bUseGame = true;
 
 	for (int nCnt = 1; nCnt < MAX_MODEL; nCnt++)
 	{
@@ -93,14 +96,14 @@ void InitEdit(void)
 		g_EditModelInfo[nCnt].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		g_EditModelInfo[nCnt].nType = 0;
 		g_EditModelInfo[nCnt].bUse = false;
+		g_EditModelInfo[nCnt].bUseGame = false;
 	}
 
 	g_fAlpha = 0.2f;
 	g_fFlash = 0.02f;
-	//g_nSaveModelCnt = 0;
+	g_nEditModelNumber = 0;
 	g_nSaveModelCnt = 0;
 	g_nSave = 0;
-	//g_nEditSelect = 0;
 
 	//頂点バッファの生成
 	pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * 4 * MAX_MODEL, D3DUSAGE_WRITEONLY, 4, D3DPOOL_MANAGED, &g_pVtxBuffEdit, NULL);
@@ -189,38 +192,26 @@ void UpdateEdit(void)
 	g_fAlpha += g_fFlash;
 
 
-	////設置するものの選択
-	//if (GetKeyboardTrigger(DIK_UP) == true)
-	//{
-	//	g_nEditSelect++;
-	//	if (g_nEditSelect >= EDIT_SELECT)
-	//	{
-	//		g_nEditSelect = 0;
-	//	}
-	//}
+	//設置するものの選択
+	if (GetKeyboardTrigger(DIK_1) == true)
+	{
+		g_Edit.EditType = EDITTYPE_MODEL;
+	}
 
-	//else if (GetKeyboardTrigger(DIK_DOWN) == true)
-	//{
-	//	g_nEditSelect--;
-	//	if (g_nEditSelect < 0)
-	//	{
-	//		g_nEditSelect = 1;
-	//	}
-	//}
+	else if (GetKeyboardTrigger(DIK_2) == true)
+	{
+		g_Edit.EditType = EDITTYPE_CORRECTIONMODEL;
+	}
 
-	//if (g_nEditSelect == 0)
-	//{//エネミー
-	//	SaveEnemy();
-	//	//UpdateCamera(g_EditModelInfo->pos);
-	//}
+	if (g_Edit.EditType == EDITTYPE_MODEL)
+	{//オブジェクト
+		SaveModel();
+	}
+	else if (g_Edit.EditType == EDITTYPE_CORRECTIONMODEL)
+	{//オブジェクト置きなおし
+		CorrectionModel();
+	}
 
-	//if (g_nEditSelect == 1)
-	//{//ブロック
-	//	SaveBlock();
-	//	//UpdateCamera(g_EditModelInfo->pos);
-	//}
-
-	SaveModel();
 
 	Camera* pCamera = GetCamera();
 
@@ -237,7 +228,7 @@ void UpdateEdit(void)
 }
 
 //=============================================
-//エネミーのセーブ処理
+//モデルのセーブ処理
 //=============================================
 void SaveModel(void)
 {
@@ -252,47 +243,49 @@ void SaveModel(void)
 
 	if (GetKeyboardPress(DIK_W) == true)
 	{
-		g_EditModelInfo[g_nSaveModelCnt].pos.z += MOVE_CURSOR
+		g_EditModelInfo[g_nEditModelNumber].pos.z += MOVE_CURSOR
 			;
 	}
 	if (GetKeyboardPress(DIK_S) == true)
 	{
-		g_EditModelInfo[g_nSaveModelCnt].pos.z -= MOVE_CURSOR;
+		g_EditModelInfo[g_nEditModelNumber].pos.z -= MOVE_CURSOR;
 	}
 	if (GetKeyboardPress(DIK_A) == true)
 	{
-		g_EditModelInfo[g_nSaveModelCnt].pos.x -= MOVE_CURSOR;
+		g_EditModelInfo[g_nEditModelNumber].pos.x -= MOVE_CURSOR;
 	}
 	if (GetKeyboardPress(DIK_D) == true)
 	{
-		g_EditModelInfo[g_nSaveModelCnt].pos.x += MOVE_CURSOR;
+		g_EditModelInfo[g_nEditModelNumber].pos.x += MOVE_CURSOR;
 	}
 
 	if (GetKeyboardTrigger(DIK_RIGHT) == true)
 	{
-		g_EditModelInfo[g_nSaveModelCnt].nType++;
-		if (g_EditModelInfo[g_nSaveModelCnt].nType >= NUM_MODEL)
+		g_EditModelInfo[g_nEditModelNumber].nType++;
+		if (g_EditModelInfo[g_nEditModelNumber].nType >= NUM_MODEL)
 		{
-			g_EditModelInfo[g_nSaveModelCnt].nType = 0;
+			g_EditModelInfo[g_nEditModelNumber].nType = 0;
 		}
 	}
 	else if (GetKeyboardTrigger(DIK_LEFT) == true)
 	{
-		g_EditModelInfo[g_nSaveModelCnt].nType--;
-		if (g_EditModelInfo[g_nSaveModelCnt].nType < 0)
+		g_EditModelInfo[g_nEditModelNumber].nType--;
+		if (g_EditModelInfo[g_nEditModelNumber].nType < 0)
 		{
-			g_EditModelInfo[g_nSaveModelCnt].nType = NUM_MODEL -1;
+			g_EditModelInfo[g_nEditModelNumber].nType = NUM_MODEL -1;
 		}
 	}
 
-	//エネミーの設置
+	//モデルの設置
 	if (GetKeyboardTrigger(DIK_0) == true)
 	{
-		g_EditModelInfo[g_nSaveModelCnt + 1].pos = g_EditModelInfo[g_nSaveModelCnt].pos;
-		g_EditModelInfo[g_nSaveModelCnt + 1].rot = g_EditModelInfo[g_nSaveModelCnt].rot;
-		g_EditModelInfo[g_nSaveModelCnt + 1].nType = g_EditModelInfo[g_nSaveModelCnt].nType;
-		g_EditModelInfo[g_nSaveModelCnt + 1].bUse = true;
+		g_EditModelInfo[g_nEditModelNumber + 1].pos = g_EditModelInfo[g_nEditModelNumber].pos;
+		g_EditModelInfo[g_nEditModelNumber + 1].rot = g_EditModelInfo[g_nEditModelNumber].rot;
+		g_EditModelInfo[g_nEditModelNumber + 1].nType = g_EditModelInfo[g_nEditModelNumber].nType;
+		g_EditModelInfo[g_nEditModelNumber + 1].bUse = true;
+		g_EditModelInfo[g_nEditModelNumber].bUseGame = true;
 		g_nSaveModelCnt++;
+		g_nEditModelNumber++;
 		//頂点カラーの設定
 		pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 		pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
@@ -312,7 +305,7 @@ void SaveModel(void)
 	//pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
 	//pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
 
-	//エネミーの設置
+	//モデルの設置
 	if (GetKeyboardTrigger(DIK_F4) == true)
 	{//セーブ処理
 		int nNumEnemy = 0;
@@ -323,7 +316,7 @@ void SaveModel(void)
 
 		for (int nCnt = 0; nCnt < MAX_MODEL; nCnt++)
 		{
-			if (g_EditModelInfo[nCnt].bUse == true)
+			if (g_EditModelInfo[nCnt].bUseGame == true)
 			{
 				nNumEnemy++;
 			}
@@ -335,7 +328,115 @@ void SaveModel(void)
 
 			for (int nCnt = 0; nCnt < MAX_MODEL; nCnt++)
 			{
-				if (g_EditModelInfo[nCnt].bUse == true)
+				if (g_EditModelInfo[nCnt].bUseGame == true)
+				{
+					fwrite(&g_EditModelInfo[nCnt], sizeof(EditModelInfo), 1, pFile);
+				}
+			}
+			fclose(pFile);
+
+			//セーブ完了
+			bSave = true;
+
+		}
+	}
+}
+
+//=============================================
+//置いたモデルの編集
+//=============================================
+void CorrectionModel(void)
+{
+	LPDIRECT3DDEVICE9 pDevice;
+	//int nCntEdit;
+	//デバイスの取得
+	pDevice = GetDevice();
+
+	//Enemy* pEnemy = GetEnemy();
+	VERTEX_3D* pVtx;
+	g_pVtxBuffEdit->Lock(0, 0, (void**)&pVtx, 0);
+
+	if (GetKeyboardTrigger(DIK_UP) == true)
+	{
+		g_nEditModelNumber++;
+		if (g_nEditModelNumber >= g_nSaveModelCnt)
+		{
+			g_nEditModelNumber = 0;
+		}
+	}
+	else if (GetKeyboardTrigger(DIK_DOWN) == true)
+	{
+		g_nEditModelNumber--;
+		if (g_nEditModelNumber < 0)
+		{
+			g_nEditModelNumber = g_nSaveModelCnt - 1;
+		}
+	}
+
+	if (GetKeyboardPress(DIK_W) == true)
+	{
+		g_EditModelInfo[g_nEditModelNumber].pos.z += MOVE_CURSOR
+			;
+	}
+	if (GetKeyboardPress(DIK_S) == true)
+	{
+		g_EditModelInfo[g_nEditModelNumber].pos.z -= MOVE_CURSOR;
+	}
+	if (GetKeyboardPress(DIK_A) == true)
+	{
+		g_EditModelInfo[g_nEditModelNumber].pos.x -= MOVE_CURSOR;
+	}
+	if (GetKeyboardPress(DIK_D) == true)
+	{
+		g_EditModelInfo[g_nEditModelNumber].pos.x += MOVE_CURSOR;
+	}
+
+	if (GetKeyboardTrigger(DIK_RIGHT) == true)
+	{
+		g_EditModelInfo[g_nEditModelNumber].nType++;
+		if (g_EditModelInfo[g_nEditModelNumber].nType >= NUM_MODEL)
+		{
+			g_EditModelInfo[g_nEditModelNumber].nType = 0;
+		}
+	}
+	else if (GetKeyboardTrigger(DIK_LEFT) == true)
+	{
+		g_EditModelInfo[g_nEditModelNumber].nType--;
+		if (g_EditModelInfo[g_nEditModelNumber].nType < 0)
+		{
+			g_EditModelInfo[g_nEditModelNumber].nType = NUM_MODEL - 1;
+		}
+	}
+
+	//モデルの設置
+	if (GetKeyboardTrigger(DIK_0) == true)
+	{
+		g_EditModelInfo[g_nEditModelNumber].bUseGame = true;
+	}
+
+	if (GetKeyboardTrigger(DIK_F4) == true)
+	{//セーブ処理
+		int nNumEnemy = 0;
+		bool bSave = false;
+		char aSave[256];
+		FILE* pFile = fopen(MODEL_FILE_BIN, "wb");
+
+
+		for (int nCnt = 0; nCnt < MAX_MODEL; nCnt++)
+		{
+			if (g_EditModelInfo[nCnt].bUseGame == true)
+			{
+				nNumEnemy++;
+			}
+		}
+
+		if (pFile != NULL)
+		{
+			fwrite(&nNumEnemy, sizeof(int), 1, pFile);
+
+			for (int nCnt = 0; nCnt < MAX_MODEL; nCnt++)
+			{
+				if (g_EditModelInfo[nCnt].bUseGame == true)
 				{
 					fwrite(&g_EditModelInfo[nCnt], sizeof(EditModelInfo), 1, pFile);
 				}
@@ -638,6 +739,21 @@ void DrawEdit(void)
 	//	}
 	//	//}
 	//}
+}
+
+//=============================================
+//エディットのデバッグ表示（主に操作説明）
+//=============================================
+void DebagEdit(void)
+{
+	LPD3DXFONT pFont = GetFont();
+	RECT rect = { 0,0,SCREEN_WIDTH,SCREEN_HEIGHT };
+	char aStr[256];
+
+	sprintf(&aStr[0], "操作方法\n[カメラ移動]\n前進:I 後進:K 左:J 右:L\nモデル設置モード:1	モデル編集モード:2\n物の設置:0\n物の移動	前進:W 後進:S 左:A 右:D");
+
+	//テキストの描画
+	pFont->DrawText(NULL, &aStr[0], -1, &rect, DT_LEFT, D3DCOLOR_RGBA(255, 255, 255, 255));
 }
 
 EditModelInfo* GetEditModelinfo(void)
