@@ -72,8 +72,11 @@ void InitEdit(void)
 
 		for (int nCntMat = 0; nCntMat < (int)g_EditModelInfo[nCnt].nNumMat; nCntMat++)
 		{
+
+			g_EditModelInfo[nCnt].Diffuse[nCntMat] = pMat[nCntMat].MatD3D.Diffuse;
 			if (pMat[nCntMat].pTextureFilename != NULL)
 			{
+
 				//テクスチャの読み込み
 				D3DXCreateTextureFromFile(pDevice,
 					pMat[nCntMat].pTextureFilename,
@@ -223,9 +226,6 @@ void UpdateEdit(void)
 		pCamera->posR = g_EditModelInfo->pos;
 
 	}
-
-	//return bSave;
-//}
 }
 
 //=============================================
@@ -450,154 +450,6 @@ void CorrectionModel(void)
 		}
 	}
 }
-
-////=============================================
-////ブロックのセーブ処理
-////=============================================
-//void SaveBlock(void)
-//{
-//	LPDIRECT3DDEVICE9 pDevice;
-//	pDevice = GetDevice();
-//
-//	VERTEX_3D* pVtx;
-//
-//	Player* pPlayer = GetPlayer();
-//	g_pVtxBuffEdit->Lock(0, 0, (void**)&pVtx, 0);
-//	if (GetKeyboardTrigger(DIK_W) == true)
-//	{
-//		g_EditModelInfo[g_nSaveModelCnt].pos.y -= BLOCK_CURSOR;
-//	}
-//	if (GetKeyboardTrigger(DIK_S) == true)
-//	{
-//		g_EditModelInfo[g_nSaveModelCnt].pos.y += BLOCK_CURSOR;
-//	}
-//	if (GetKeyboardTrigger(DIK_A) == true && g_EditModelInfo[g_nSaveModelCnt].pos.x > 0.0f)
-//	{
-//		g_EditModelInfo[g_nSaveModelCnt].pos.x -= BLOCK_CURSOR;
-//	}
-//	if (GetKeyboardTrigger(DIK_D) == true && g_EditModelInfo[g_nSaveModelCnt].pos.x < EDIT_WIDE)
-//	{
-//		g_EditModelInfo[g_nSaveModelCnt].pos.x += BLOCK_CURSOR;
-//	}
-//	if (GetKeyboardTrigger(DIK_1) == true)
-//	{
-//		g_EditModelInfo[g_nSaveModelCnt].pos =  pPlayer->pos;
-//	}
-//
-//
-//	if (GetKeyboardTrigger(DIK_RIGHT) == true)
-//	{
-//		g_EditModelInfo[g_nSaveModelCnt].nType++;
-//		if (g_EditModelInfo[g_nSaveModelCnt].nType >= BLOCKTYPE_MAX)
-//		{
-//			g_EditModelInfo[g_nSaveModelCnt].nType = 0;
-//		}
-//	}
-//	else if (GetKeyboardTrigger(DIK_LEFT) == true)
-//	{
-//		g_EditModelInfo[g_nSaveModelCnt].nType--;
-//		if (g_EditModelInfo[g_nSaveModelCnt].nType < 0)
-//		{
-//			g_EditModelInfo[g_nSaveModelCnt].nType = BLOCKTYPE_MAX-1 ;
-//		}
-//	}
-//
-//	//ブロックの設置
-//	if (GetKeyboardTrigger(DIK_0) == true)
-//	{
-//		g_EditModelInfo[g_nSaveModelCnt + 1].pos = g_EditModelInfo[g_nSaveModelCnt].pos;
-//		g_EditModelInfo[g_nSaveModelCnt + 1].nType = g_EditModelInfo[g_nSaveModelCnt].nType;
-//		g_EditModelInfo[g_nSaveModelCnt + 1].bUse = true;
-//		g_nSaveModelCnt++;
-//	}
-//
-//	D3DXVECTOR3 Vtx = ScreenConversion(g_EditModelInfo[g_nSaveModelCnt].pos);
-//
-//
-//	pVtx += (VERTEX * g_nSaveModelCnt);
-//
-//	//頂点座標の設定
-//	pVtx[0].pos.x = Vtx.x - BLOCK_RADIUS;
-//	pVtx[0].pos.y = Vtx.y - BLOCK_RADIUS;
-//	pVtx[0].pos.z = 0.0f;
-//
-//	pVtx[1].pos.x = Vtx.x + BLOCK_RADIUS;
-//	pVtx[1].pos.y = Vtx.y - BLOCK_RADIUS;
-//	pVtx[1].pos.z = 0.0f;
-//
-//	pVtx[2].pos.x = Vtx.x - BLOCK_RADIUS;
-//	pVtx[2].pos.y = Vtx.y + BLOCK_RADIUS;
-//	pVtx[2].pos.z = 0.0f;
-//
-//	pVtx[3].pos.x = Vtx.x + BLOCK_RADIUS;
-//	pVtx[3].pos.y = Vtx.y + BLOCK_RADIUS;
-//	pVtx[3].pos.z = 0.0f;
-//
-//	//pVtx[1].pos = D3DXVECTOR3(g_EditModelInfo[g_nSaveModelCnt].pos.x + (MOVE_CURSOR * 0.5f), g_EditModelInfo[g_nSaveModelCnt].pos.y, 0.0f);
-//	//pVtx[2].pos = D3DXVECTOR3(g_EditModelInfo[g_nSaveModelCnt].pos.x - (MOVE_CURSOR * 0.5f), g_EditModelInfo[g_nSaveModelCnt].pos.y + MOVE_CURSOR, 0.0f);
-//	//pVtx[3].pos = D3DXVECTOR3(g_EditModelInfo[g_nSaveModelCnt].pos.x + (MOVE_CURSOR * 0.5f), g_EditModelInfo[g_nSaveModelCnt].pos.y + MOVE_CURSOR, 0.0f);
-//
-//	//rhwの設定
-//	pVtx[0].rhw = 1.0f;
-//	pVtx[1].rhw = 1.0f;
-//	pVtx[2].rhw = 1.0f;
-//	pVtx[3].rhw = 1.0f;
-//
-//	//頂点カラーの設定
-//	pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlpha);
-//	pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlpha);
-//	pVtx[2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlpha);
-//	pVtx[3].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlpha);
-//
-//
-//	if (g_EditModelInfo[g_nSaveModelCnt].nType == BLOCKTYPE_SNOW)
-//	{
-//		//テクスチャ座標の設定
-//		pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-//		pVtx[1].tex = D3DXVECTOR2(0.5f, 0.0f);
-//		pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-//		pVtx[3].tex = D3DXVECTOR2(0.5f, 1.0f);
-//	}
-//
-//
-//
-//	//ブロック設置
-//	if (GetKeyboardTrigger(DIK_F4) == true)
-//	{//セーブ処理
-//		int nNumBlock = 0;
-//		bool bSave = false;
-//		char aSave[256];
-//		FILE* pFile = fopen(FILE_BLOCK, "wb");
-//
-//
-//		for (int nCnt = 0; nCnt < MAX_BLOCK; nCnt++)
-//		{
-//			if (g_EditModelInfo[nCnt].bUse == true)
-//			{
-//				nNumBlock++;
-//			}
-//		}
-//
-//		if (pFile != NULL)
-//		{
-//			fwrite(&nNumBlock, sizeof(int), 1, pFile);
-//			for (int nCnt = 0; nCnt < MAX_BLOCK; nCnt++)
-//			{
-//				if (g_EditModelInfo[nCnt].bUse == true)
-//				{
-//					fwrite(&g_EditModelInfo[nCnt], sizeof(EditBlockInfo), 1, pFile);
-//				}
-//			}
-//			fclose(pFile);
-//
-//			//セーブ完了
-//			bSave = true;
-//
-//		}
-//
-//	}
-//}
-
 //=============================================
 //敵の途中からセーブ処理
 //=============================================
@@ -624,44 +476,6 @@ void reSaveModel(void)
 		return;
 	}
 }
-
-////=============================================
-////ブロックの途中からセーブ処理
-////=============================================
-//void reSaveBlock(void)
-//{
-//	//ファイルの読み込み
-//	FILE* pFile = fopen(FILE_BLOCK, "rb");
-//
-//	if (pFile != NULL)
-//	{
-//		//ブロックの使用してる数の読み込み
-//		fread(&g_nSaveModelCnt, sizeof(int), 1, pFile);
-//
-//		//ブロックの使用数分、敵の読み込み
-//		fread(&g_EditModelInfo[0], sizeof(EditBlockInfo), g_nSaveModelCnt, pFile);
-//
-//		//ファイルを閉じる
-//		fclose(pFile);
-//
-//	}
-//
-//	else
-//	{
-//		return;
-//	}
-//
-//	//nFrame++;
-//	//int nAnswer = nFrame / 60;
-//	//if (nAnswer == 1)
-//	//{
-//	//for (int nCnt = 0; nCnt < g_nUseBlock; nCnt++)
-//	//{
-//	//	Setblock(g_BlockInfo[nCnt].pos, g_BlockInfo[nCnt].nType);
-//	//}
-//	//	nFrame = 0;
-//	//}
-//}
 
 //=============================================
 //描画処理
@@ -701,6 +515,16 @@ void DrawEdit(void)
 
 			for (int nCntMat = 0; nCntMat < (int)g_EditModelInfo[g_EditModelInfo[nCnt].nType].nNumMat; nCntMat++)
 			{
+				//if (nCntFrame == 60)
+				//{
+					pMat[nCntMat].MatD3D.Diffuse.r = 1.0f;
+					pMat[nCntMat].MatD3D.Diffuse.g = 0.0f;
+					pMat[nCntMat].MatD3D.Diffuse.b = 0.0f;
+					pMat[nCntMat].MatD3D.Diffuse.a = 1.0f;
+				//}
+
+				//元の色に戻す
+				//pMat[nCntMat].MatD3D.Diffuse = g_EditModelInfo[nCnt].Diffuse[nCntMat];
 				//マテリアルの設定
 				pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
 
@@ -715,31 +539,6 @@ void DrawEdit(void)
 	}
 	//保存してたマテリアルを戻す
 	pDevice->SetMaterial(&matDef);
-		//}
-	//}
-
-	//else if (g_nEditSelect == 1)
-	//{//ブロック
-	//	for (int nCntEdit = 0; nCntEdit < MAX_BLOCK; nCntEdit++)
-	//	{
-	//		//if (g_EditModelInfo[nCntEdit].bUse == true)
-	//		//{
-	//		for (int nCnt = 6; nCnt < NUM_TYPE_EDIT; nCnt++)
-	//		{
-	//			if (g_EditModelInfo[nCntEdit].nType + 6 == nCnt)
-	//			{
-	//				//テクスチャの設定
-	//				pDevice->SetTexture(0, g_apTextureEdit[nCnt]);
-	//			}
-	//		}
-
-	//		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP,
-	//			VERTEX * nCntEdit,
-	//			2);
-
-	//	}
-	//	//}
-	//}
 }
 
 //=============================================
@@ -751,7 +550,7 @@ void DebagEdit(void)
 	RECT rect = { 0,0,SCREEN_WIDTH,SCREEN_HEIGHT };
 	char aStr[256];
 
-	sprintf(&aStr[0], "操作方法\n[カメラ移動]\n前進:I 後進:K 左:J 右:L\nモデル設置モード:1	モデル編集モード:2\n物の設置:0\n物の移動	前進:W 後進:S 左:A 右:D");
+	sprintf(&aStr[0], "操作方法\n[カメラ移動]\n前進:I 後進:K 左:J 右:L\nモデル設置モード:1	モデル編集モード:2\n物の設置:0\n物の移動	前進:W 後進:S 左:A 右:D\nタイプの切り替え→or←");
 
 	//テキストの描画
 	pFont->DrawText(NULL, &aStr[0], -1, &rect, DT_LEFT, D3DCOLOR_RGBA(255, 255, 255, 255));
@@ -761,15 +560,3 @@ EditModelInfo* GetEditModelinfo(void)
 {
 	return &g_EditModelInfo[0];
 }
-
-//EditBlockInfo* GetEditBlockinfo(void)
-//{
-//	return &g_EditModelInfo[0];
-//}
-
-
-////現在設置するものの確認（デバック表示用）
-//int GetEditSelect(void)
-//{
-//	return g_nEditSelect;
-//}

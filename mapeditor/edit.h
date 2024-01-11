@@ -39,6 +39,7 @@ typedef struct
 	LPD3DXBUFFER pBuffMat;
 	DWORD nNumMat;
 	D3DXMATRIX mtxWorld;
+	D3DCOLORVALUE Diffuse[MAX_MODEL];
 	int nType;
 	bool bUse;
 	bool bUseGame; 
