@@ -388,7 +388,7 @@ void Draw(void)
 
 		DrawShadow();
 
-		DebagCamera();
+		DebagCameraPos();
 		//•`‰æI—¹
 		g_pD3DDevice->EndScene();
 	}

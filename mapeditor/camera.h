@@ -44,7 +44,7 @@ void EditCamera(void);
 void TurnCamera(void);
 void SetCamera(void);
 
-void DebagCamera(void);
+void DebagCameraPos(void);
 
 Camera* GetCamera(void);
 

@@ -152,7 +152,6 @@ void UpdateCamera(void)
 
 
 			g_Camera.posR.x = g_Camera.posV.x + sinf(g_Camera.rot.y) * g_Camera.fLength;
-			/*g_Camera.posR.y = g_Camera.posV.y - 100;*/
 			g_Camera.posR.z = g_Camera.posV.z + cosf(g_Camera.rot.y) * g_Camera.fLength;
 #endif
 		}
@@ -172,14 +171,13 @@ void UpdateCamera(void)
 			g_Camera.rot.y += 0.02f;
 
 			g_Camera.posR.x = g_Camera.posV.x + sinf(g_Camera.rot.y) * g_Camera.fLength;
-			/*g_Camera.posR.y = g_Camera.posV.y - 100;*/
 			g_Camera.posR.z = g_Camera.posV.z + cosf(g_Camera.rot.y) * g_Camera.fLength;
 #endif
 		}
 
 		if (GetKeyboardPress(DIK_U) == true || GetJoypadPress(JOYKEY_LB) == true)
 		{
-			g_Camera.rot.y -= 0.02f;
+			g_Camera.rot.y-= 0.02f;
 			g_Camera.posV.x = g_Camera.posR.x - sinf(g_Camera.rot.y) * g_Camera.fLength;
 			g_Camera.posV.z = g_Camera.posR.z - cosf(g_Camera.rot.y) * g_Camera.fLength;
 		}
@@ -296,13 +294,14 @@ void SetCamera(void)
 	pDevice->SetTransform(D3DTS_VIEW, &g_Camera.mtxView);
 }
 
-void DebagCamera(void)
+void DebagCameraPos(void)
 {
 	LPD3DXFONT pFont = GetFont();
 	RECT rect = { 0,0,SCREEN_WIDTH,SCREEN_HEIGHT };
 	char aStr[256];
 
-	sprintf(&aStr[0], "posV:%f,%f,%f", g_Camera.posV.x, g_Camera.posV.y, g_Camera.posV.z);
+	sprintf(&aStr[0], "[カメラ情報]\nposV:%f,%f,%f\nposR:%f,%f,%f", g_Camera.posV.x, g_Camera.posV.y, g_Camera.posV.z
+		,g_Camera.posR.x, g_Camera.posR.y, g_Camera.posR.z);
 
 	//テキストの描画
 	pFont->DrawText(NULL, &aStr[0], -1, &rect, DT_LEFT, D3DCOLOR_RGBA(255, 255, 255, 255));
