@@ -196,6 +196,7 @@ void UpdateEdit(void)
 	if (GetKeyboardTrigger(DIK_1) == true)
 	{
 		g_Edit.EditType = EDITTYPE_MODEL;
+		g_nEditModelNumber = g_nSaveModelCnt;
 	}
 
 	else if (GetKeyboardTrigger(DIK_2) == true)
