@@ -387,12 +387,14 @@ void Draw(void)
 		{
 			DrawEdit();
 		}
+		else if (g_bEdit == false)
+		{
+			DrawModel();
+		}
 
 		DrawField();
 
 		DrawWall();
-
-		DrawModel();
 
 		DrawShadow();
 

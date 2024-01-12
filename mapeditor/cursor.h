@@ -16,6 +16,7 @@ typedef struct
 {
 	D3DXMATRIX mtxWorld;
 	D3DXVECTOR3 pos;
+	bool bUse;
 	int IndexEdit;
 }Cursol;
 

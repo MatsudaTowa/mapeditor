@@ -37,6 +37,7 @@ void InitCursor(void)
 
 	g_Cursol.pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f); //カーソルの初期位置
 	g_Cursol.IndexEdit = 0; //カーソルを合わせる初期化
+	g_Cursol.bUse = false; //使用しない
 
 	pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * 4, D3DUSAGE_WRITEONLY, FVF_VERTEX_3D, D3DPOOL_MANAGED, &g_pVtxBuffCursor, NULL);
 
@@ -158,4 +159,6 @@ void DrawCursor(void)
 void SetCursor(D3DXVECTOR3 pos)
 {
 	g_Cursol.pos = pos;
+	g_Cursol.bUse = true; //使用しない
+
 }
