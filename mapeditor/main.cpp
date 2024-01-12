@@ -13,6 +13,7 @@
 #include "model.h"
 #include "shadow.h"
 #include "wall.h"
+#include "cursor.h"
 #include<Mmsystem.h>
 #include "input.h"
 #pragma comment(lib,"winmm.lib")
@@ -252,6 +253,8 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 
 	InitEdit();
 
+	InitCursor();
+
 	D3DXCreateFont(g_pD3DDevice, 18, 0, 0, 0,
 		FALSE, SHIFTJIS_CHARSET,
 		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH,
@@ -288,6 +291,8 @@ void Uninit(void)
 	UninitShadow();
 
 	UninitEdit();
+
+	UninitCursor();
 
 	//Direct3Dデバイスの破棄
 	if (g_pD3DDevice != NULL)
@@ -340,6 +345,9 @@ void Update(void)
 		UpdateModel();
 
 		UpdateShadow();
+
+		UpdateCursor();
+
 	}
 
 	//ワイヤーフレーム切り替え
@@ -389,6 +397,8 @@ void Draw(void)
 		DrawShadow();
 
 		DebagCameraPos();
+
+		DrawCursor();
 
 		DebagEdit();
 

@@ -8,6 +8,7 @@
 #include "model.h"
 #include "input.h"
 #include "camera.h"
+#include "cursor.h"
 #include <string.h>
 #include <stdio.h>
 //マクロ定義
@@ -20,7 +21,9 @@
 #define EDIT_SELECT	(2) //エディットセレクト数（敵・ブロック）
 #define NUM_TYPE_EDIT	(2) //エディットで置ける種類 (モデル)
 
+//=============================================
 //グローバル変数
+//=============================================
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffEdit = NULL;
 LPDIRECT3DTEXTURE9 g_apTextureEdit[NUM_TYPE_EDIT][NUM_TEXTURE] = {}; //テクスチャポインタ
 Edit g_Edit; //エディット情報
@@ -539,6 +542,8 @@ void DrawEdit(void)
 	}
 	//保存してたマテリアルを戻す
 	pDevice->SetMaterial(&matDef);
+
+	SetCursor(D3DXVECTOR3(g_EditModelInfo[g_nEditModelNumber].pos.x, 30.0f, g_EditModelInfo[g_nEditModelNumber].pos.z));
 }
 
 //=============================================
