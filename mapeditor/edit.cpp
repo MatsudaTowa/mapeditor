@@ -517,10 +517,10 @@ void DrawEdit(void)
 			{
 				//if (nCntFrame == 60)
 				//{
-					pMat[nCntMat].MatD3D.Diffuse.r = 1.0f;
-					pMat[nCntMat].MatD3D.Diffuse.g = 0.0f;
-					pMat[nCntMat].MatD3D.Diffuse.b = 0.0f;
-					pMat[nCntMat].MatD3D.Diffuse.a = 1.0f;
+					//pMat[nCntMat].MatD3D.Diffuse.r = 1.0f;
+					//pMat[nCntMat].MatD3D.Diffuse.g = 0.0f;
+					//pMat[nCntMat].MatD3D.Diffuse.b = 0.0f;
+					//pMat[nCntMat].MatD3D.Diffuse.a = 1.0f;
 				//}
 
 				//å≥ÇÃêFÇ…ñﬂÇ∑
