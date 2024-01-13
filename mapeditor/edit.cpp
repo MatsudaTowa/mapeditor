@@ -79,7 +79,6 @@ void InitEdit(void)
 			g_EditModelInfo[nCnt].Diffuse[nCntMat] = pMat[nCntMat].MatD3D.Diffuse;
 			if (pMat[nCntMat].pTextureFilename != NULL)
 			{
-
 				//テクスチャの読み込み
 				D3DXCreateTextureFromFile(pDevice,
 					pMat[nCntMat].pTextureFilename,
@@ -190,14 +189,6 @@ void UninitEdit(void)
 //=============================================
 void UpdateEdit(void)
 {
-
-	if (g_fAlpha >= 1.0f || g_fAlpha <= 0.0f)
-	{
-		g_fFlash *= -1.0f;
-	}
-	g_fAlpha += g_fFlash;
-
-
 	//設置するものの選択
 	if (GetKeyboardTrigger(DIK_1) == true)
 	{
@@ -449,7 +440,6 @@ void CorrectionModel(void)
 
 			//セーブ完了
 			bSave = true;
-
 		}
 	}
 }
@@ -471,7 +461,6 @@ void reSaveModel(void)
 
 		//ファイルを閉じる
 		fclose(pFile);
-
 	}
 
 	else
@@ -537,13 +526,13 @@ void DrawEdit(void)
 				//パーツの設定
 				g_EditModelInfo[g_EditModelInfo[nCnt].nType].pMesh->DrawSubset(nCntMat);
 			}
-
 		}
 	}
+
 	//保存してたマテリアルを戻す
 	pDevice->SetMaterial(&matDef);
 
-	SetCursor(D3DXVECTOR3(g_EditModelInfo[g_nEditModelNumber].pos.x, 30.0f, g_EditModelInfo[g_nEditModelNumber].pos.z));
+	SetCursor(D3DXVECTOR3(g_EditModelInfo[g_nEditModelNumber].pos.x, 40.0f, g_EditModelInfo[g_nEditModelNumber].pos.z));
 }
 
 //=============================================

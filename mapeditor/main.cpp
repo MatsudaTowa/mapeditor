@@ -35,6 +35,7 @@ DWORD OldTime = timeGetTime();
 int g_nCntFPS = 0;
 bool g_bWireFrame; //ワイヤーフレーム
 bool g_bEdit; //エディットしてるか
+bool g_bReSave; //再配置
 int g_nUseModel;
 int g_ModelCnt;
 ModelInfo g_aModelInfo[MAX_MODEL];
@@ -217,6 +218,7 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	
 	g_bWireFrame = false; //ワイヤーフレームを描画しない
 	g_bEdit = false; //エディットをしない
+	g_bReSave = false; //再配置していない状態
 	g_ModelCnt = 0;
 	g_nUseModel = 0;
 	//キーボードの初期化処理
@@ -317,7 +319,7 @@ void Update(void)
 	//キーボードの更新処理
 	UpdateKeyboard();
 
-	//キーボードの更新処理
+	//マウスの更新処理
 	UpdateMouse();
 
 	//padの更新処理
@@ -330,6 +332,15 @@ void Update(void)
 	if (GetKeyboardTrigger(DIK_F2) == true)
 	{
 		g_bEdit = g_bEdit ? false : true;
+	}
+	else if (GetKeyboardTrigger(DIK_F3) == true)
+	{
+		g_bReSave = g_bReSave ? false : true;
+		if (g_bReSave == true)
+		{
+			reSaveModel();
+			UpdateEdit();
+		}
 	}
 
 	if (g_bEdit == true)
@@ -345,10 +356,9 @@ void Update(void)
 		UpdateModel();
 
 		UpdateShadow();
-
-		UpdateCursor();
-
 	}
+
+	UpdateCursor();
 
 	//ワイヤーフレーム切り替え
 	if (GetKeyboardTrigger(DIK_F9) == true)
@@ -383,11 +393,11 @@ void Draw(void)
 	{
 		SetCamera();
 
-		if (g_bEdit == true)
+		if (g_bEdit == true || g_bReSave == true)
 		{
 			DrawEdit();
 		}
-		else if (g_bEdit == false)
+		if (g_bEdit == false)
 		{
 			DrawModel();
 		}

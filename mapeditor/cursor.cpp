@@ -106,51 +106,55 @@ void UpdateCursor(void)
 //=============================================
 void DrawCursor(void)
 {
-	//デバイスの取得
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
-	D3DXMATRIX mtxTrans; //計算用マトリックス
+	if (g_Cursol.bUse == true)
+	{
+		//デバイスの取得
+		LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
-	D3DXMATRIX mtxView; //ビューマトリックス取得用
+		D3DXMATRIX mtxTrans; //計算用マトリックス
 
-	//マトリックスの初期化
-	D3DXMatrixIdentity(&g_Cursol.mtxWorld);
+		D3DXMATRIX mtxView; //ビューマトリックス取得用
 
-	//ビューマトリックスを取得
-	pDevice->GetTransform(D3DTS_VIEW, &mtxView);
+		//マトリックスの初期化
+		D3DXMatrixIdentity(&g_Cursol.mtxWorld);
 
-	//ポリゴンの正面をカメラに向ける
-	D3DXMatrixInverse(&g_Cursol.mtxWorld, NULL, &mtxView);
+		//ビューマトリックスを取得
+		pDevice->GetTransform(D3DTS_VIEW, &mtxView);
 
-	g_Cursol.mtxWorld._41 = 0.0f;
-	g_Cursol.mtxWorld._42 = 0.0f;
-	g_Cursol.mtxWorld._43 = 0.0f;
+		//ポリゴンの正面をカメラに向ける
+		D3DXMatrixInverse(&g_Cursol.mtxWorld, NULL, &mtxView);
 
-	//位置を反映
-	D3DXMatrixTranslation(&mtxTrans, g_Cursol.pos.x, g_Cursol.pos.y, g_Cursol.pos.z);
+		g_Cursol.mtxWorld._41 = 0.0f;
+		g_Cursol.mtxWorld._42 = 0.0f;
+		g_Cursol.mtxWorld._43 = 0.0f;
 
-	D3DXMatrixMultiply(&g_Cursol.mtxWorld, &g_Cursol.mtxWorld, &mtxTrans);
+		//位置を反映
+		D3DXMatrixTranslation(&mtxTrans, g_Cursol.pos.x, g_Cursol.pos.y, g_Cursol.pos.z);
 
-	//ライトを無効にする
-	pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+		D3DXMatrixMultiply(&g_Cursol.mtxWorld, &g_Cursol.mtxWorld, &mtxTrans);
 
-	//ワールドマトリックスの設定
-	pDevice->SetTransform(D3DTS_WORLD, &g_Cursol.mtxWorld);
+		//ライトを無効にする
+		pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 
-	//頂点バッファをデータストリームに設定
-	pDevice->SetStreamSource(0, g_pVtxBuffCursor, 0, sizeof(VERTEX_3D));
+		//ワールドマトリックスの設定
+		pDevice->SetTransform(D3DTS_WORLD, &g_Cursol.mtxWorld);
 
-	//頂点フォーマットの設定
-	pDevice->SetFVF(FVF_VERTEX_3D);
+		//頂点バッファをデータストリームに設定
+		pDevice->SetStreamSource(0, g_pVtxBuffCursor, 0, sizeof(VERTEX_3D));
 
-	//テクスチャの設定
-	pDevice->SetTexture(0, g_pTextureCursor);
+		//頂点フォーマットの設定
+		pDevice->SetFVF(FVF_VERTEX_3D);
 
-	//ポリゴンの描画
-	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+		//テクスチャの設定
+		pDevice->SetTexture(0, g_pTextureCursor);
 
-	//ライトを有効に戻す
-	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
+		//ポリゴンの描画
+		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+
+		//ライトを有効に戻す
+		pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
+	}
 }
 
 //=============================================
@@ -159,6 +163,6 @@ void DrawCursor(void)
 void SetCursor(D3DXVECTOR3 pos)
 {
 	g_Cursol.pos = pos;
-	g_Cursol.bUse = true; //使用しない
+	g_Cursol.bUse = true; //使用する
 
 }
