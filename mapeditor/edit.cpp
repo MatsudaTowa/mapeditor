@@ -192,16 +192,28 @@ void UninitEdit(void)
 //=============================================
 void UpdateEdit(void)
 {
-	//設置するものの選択
+
 	if (GetKeyboardTrigger(DIK_1) == true)
-	{
+	{//モデルを設置
 		g_Edit.EditType = EDITTYPE_MODEL;
 		g_nEditModelNumber = g_nSaveModelCnt;
+
+		if (g_EditModelInfo[g_nEditModelNumber].bUseGame == false)
+		{
+			g_EditModelInfo[g_nEditModelNumber].bUse = true; //次に設置するものは表示しない
+			g_nEditModelNumber++;
+		}
 	}
 
+
 	else if (GetKeyboardTrigger(DIK_2) == true)
-	{
+	{//今まで置いたモデルの編集
 		g_Edit.EditType = EDITTYPE_CORRECTIONMODEL;
+		if (g_EditModelInfo[g_nEditModelNumber].bUseGame == false)
+		{
+			g_EditModelInfo[g_nEditModelNumber].bUse = false; //次に設置するものは表示しない
+			g_nEditModelNumber--;
+		}
 	}
 
 	if (g_Edit.EditType == EDITTYPE_MODEL)
