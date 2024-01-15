@@ -201,7 +201,6 @@ void UpdateEdit(void)
 		if (g_EditModelInfo[g_nEditModelNumber].bUseGame == false)
 		{
 			g_EditModelInfo[g_nEditModelNumber].bUse = true; //éüÇ…ê›íuÇ∑ÇÈÇ‡ÇÃÇÕï\é¶ÇµÇ»Ç¢
-			g_nEditModelNumber++;
 		}
 	}
 
