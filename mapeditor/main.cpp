@@ -333,17 +333,16 @@ void Update(void)
 	{
 		g_bEdit = g_bEdit ? false : true;
 	}
-	else if (GetKeyboardTrigger(DIK_F3) == true)
+	if (GetKeyboardTrigger(DIK_F3) == true)
 	{
 		g_bReSave = g_bReSave ? false : true;
 		if (g_bReSave == true)
 		{
 			reSaveModel();
-			UpdateEdit();
 		}
 	}
 
-	if (g_bEdit == true)
+	if (g_bEdit == true || g_bReSave == true)
 	{
 		UpdateEdit();
 	}

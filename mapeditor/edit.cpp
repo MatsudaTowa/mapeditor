@@ -470,6 +470,16 @@ void reSaveModel(void)
 	{
 		return;
 	}
+
+	for (int nCntUseModel = 0; nCntUseModel < MAX_MODEL; nCntUseModel++)
+	{
+		if (g_EditModelInfo[nCntUseModel].bUse == true)
+		{
+			g_nEditModelNumber++;
+		}
+	}
+
+	g_EditModelInfo[g_nEditModelNumber].bUse = true; //•Û‘¶‚³‚ê‚Ä‚éÅŒã‚Ìƒ‚ƒfƒ‹‚ÌŽŸ‚Ì‚â‚Â‚ðtrue‚É
 }
 
 //=============================================
