@@ -27,6 +27,9 @@
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffEdit = NULL;
 LPDIRECT3DTEXTURE9 g_apTextureEdit[NUM_TYPE_EDIT][NUM_TEXTURE] = {}; //テクスチャポインタ
 Edit g_Edit; //エディット情報
+LPD3DXMESH g_apMeshEditModel[NUM_MODEL];
+LPD3DXBUFFER g_apBuffMatEditModel[NUM_MODEL];
+DWORD g_anNumMatEditModel[NUM_MODEL];
 EditModelInfo g_EditModelInfo[MAX_MODEL]; //モデルのエディット情報
 
 bool g_bSave = true; //セーブできるか
@@ -57,37 +60,6 @@ void InitEdit(void)
 
 	g_Edit.EditType = EDITTYPE_MODEL;
 
-	for (int nCnt = 0; nCnt < NUM_MODEL; nCnt++)
-	{
-		//Xファイルの読み込み
-		D3DXLoadMeshFromX(MODEL_NAME[nCnt],
-			D3DXMESH_SYSTEMMEM,
-			pDevice,
-			NULL,
-			&g_EditModelInfo[nCnt].pBuffMat,
-			NULL,
-			&g_EditModelInfo[nCnt].nNumMat,
-			&g_EditModelInfo[nCnt].pMesh);
-
-
-		D3DXMATERIAL* pMat; //マテリアルポインタ
-		pMat = (D3DXMATERIAL*)g_EditModelInfo[nCnt].pBuffMat->GetBufferPointer();
-
-		for (int nCntMat = 0; nCntMat < (int)g_EditModelInfo[nCnt].nNumMat; nCntMat++)
-		{
-
-			g_EditModelInfo[nCnt].Diffuse[nCntMat] = pMat[nCntMat].MatD3D.Diffuse;
-			if (pMat[nCntMat].pTextureFilename != NULL)
-			{
-				//テクスチャの読み込み
-				D3DXCreateTextureFromFile(pDevice,
-					pMat[nCntMat].pTextureFilename,
-					&g_apTextureEdit[nCnt][nCntMat]
-				);
-			}
-		}
-	}
-
 	//ブロックに書き込む情報の初期化
 	g_EditModelInfo[0].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	g_EditModelInfo[0].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -102,6 +74,37 @@ void InitEdit(void)
 		g_EditModelInfo[nCnt].nType = 0;
 		g_EditModelInfo[nCnt].bUse = false;
 		g_EditModelInfo[nCnt].bUseGame = false;
+	}
+
+	for (int nCnt = 0; nCnt < NUM_MODEL; nCnt++)
+	{
+		//Xファイルの読み込み
+		D3DXLoadMeshFromX(MODEL_NAME[nCnt],
+			D3DXMESH_SYSTEMMEM,
+			pDevice,
+			NULL,
+			&g_apBuffMatEditModel[nCnt],
+			NULL,
+			&g_anNumMatEditModel[nCnt],
+			&g_apMeshEditModel[nCnt]);
+
+
+		D3DXMATERIAL* pMat; //マテリアルポインタ
+		pMat = (D3DXMATERIAL*)g_apBuffMatEditModel[nCnt]->GetBufferPointer();
+
+		for (int nCntMat = 0; nCntMat < (int)g_anNumMatEditModel[nCnt]; nCntMat++)
+		{
+
+			g_EditModelInfo[nCnt].Diffuse[nCntMat] = pMat[nCntMat].MatD3D.Diffuse;
+			if (pMat[nCntMat].pTextureFilename != NULL)
+			{
+				//テクスチャの読み込み
+				D3DXCreateTextureFromFile(pDevice,
+					pMat[nCntMat].pTextureFilename,
+					&g_apTextureEdit[nCnt][nCntMat]
+				);
+			}
+		}
 	}
 
 	g_fAlpha = 0.2f;
@@ -169,17 +172,17 @@ void UninitEdit(void)
 	for (int nCnt = 0; nCnt < MAX_MODEL; nCnt++)
 	{
 		//メッシュの破棄
-		if (g_EditModelInfo[nCnt].pMesh != NULL)
+		if (g_apMeshEditModel[g_EditModelInfo[nCnt].nType] != NULL)
 		{
-			g_EditModelInfo[nCnt].pMesh->Release();
-			g_EditModelInfo[nCnt].pMesh = NULL;
+			g_apMeshEditModel[g_EditModelInfo[nCnt].nType]->Release();
+			g_apMeshEditModel[g_EditModelInfo[nCnt].nType] = NULL;
 		}
 
 		//マテリアルの破棄
-		if (g_EditModelInfo[nCnt].pBuffMat != NULL)
+		if (g_apBuffMatEditModel[g_EditModelInfo[nCnt].nType] != NULL)
 		{
-			g_EditModelInfo[nCnt].pBuffMat->Release();
-			g_EditModelInfo[nCnt].pBuffMat = NULL;
+			g_apBuffMatEditModel[g_EditModelInfo[nCnt].nType]->Release();
+			g_apBuffMatEditModel[g_EditModelInfo[nCnt].nType] = NULL;
 		}
 	}
 }
@@ -503,9 +506,9 @@ void DrawEdit(void)
 
 			D3DXMATERIAL* pMat; //マテリアル
 
-			pMat = (D3DXMATERIAL*)g_EditModelInfo[g_EditModelInfo[nCnt].nType].pBuffMat->GetBufferPointer();
+			pMat = (D3DXMATERIAL*)g_apBuffMatEditModel[g_EditModelInfo[nCnt].nType]->GetBufferPointer();
 
-			for (int nCntMat = 0; nCntMat < (int)g_EditModelInfo[g_EditModelInfo[nCnt].nType].nNumMat; nCntMat++)
+			for (int nCntMat = 0; nCntMat < (int)g_anNumMatEditModel[g_EditModelInfo[nCnt].nType]; nCntMat++)
 			{
 				//if (nCntFrame == 60)
 				//{
@@ -524,7 +527,7 @@ void DrawEdit(void)
 				pDevice->SetTexture(0,g_apTextureEdit[g_EditModelInfo[nCnt].nType][nCntMat]);
 
 				//パーツの設定
-				g_EditModelInfo[g_EditModelInfo[nCnt].nType].pMesh->DrawSubset(nCntMat);
+				g_apMeshEditModel[g_EditModelInfo[nCnt].nType]->DrawSubset(nCntMat);
 			}
 		}
 	}

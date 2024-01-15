@@ -35,9 +35,6 @@ typedef struct
 	D3DXVECTOR3 pos;
 	D3DXVECTOR3 rot;
 	D3DXVECTOR3 move;
-	LPD3DXMESH pMesh;
-	LPD3DXBUFFER pBuffMat;
-	DWORD nNumMat;
 	D3DXMATRIX mtxWorld;
 	D3DCOLORVALUE Diffuse[MAX_MODEL];
 	int nType;

@@ -34,16 +34,6 @@ static const char* MODEL_NAME[NUM_MODEL] =
 };
 
 //=============================================
-//テクスチャの種類
-//=============================================
-//static const char* TEXTURE_NAME[NUM_TEXTURE] =
-//{
-//	"data\\TEXTURE\\thumb-gray-rock-texture-stone-texture-gray-stone-background-rock-background-natural-stone-texture.jpg",
-//	"data\\TEXTURE\\metal_00005.jpg",
-//	"data\\TEXTURE\\yoshida.png",
-//};
-
-//=============================================
 //ポリゴンの初期化処理
 //=============================================
 void InitModel(void)

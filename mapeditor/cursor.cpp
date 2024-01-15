@@ -164,5 +164,4 @@ void SetCursor(D3DXVECTOR3 pos)
 {
 	g_Cursol.pos = pos;
 	g_Cursol.bUse = true; //Žg—p‚·‚é
-
 }

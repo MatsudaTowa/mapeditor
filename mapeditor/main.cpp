@@ -397,7 +397,7 @@ void Draw(void)
 		{
 			DrawEdit();
 		}
-		if (g_bEdit == false)
+		if (g_bEdit == false || g_bReSave ==false)
 		{
 			DrawModel();
 		}
