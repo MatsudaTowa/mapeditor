@@ -1,6 +1,6 @@
 //=============================================
 //
-//3Dテンプレート[main.h]
+//マップエディター[main.h]
 //Auther Matsuda Towa
 //
 //=============================================
@@ -32,8 +32,9 @@
 #define MODEL_FILE_BIN	"data\\Model.bin"
 #define FILE_RANKING	"data\\rankingdata.txt"
 
-
+//=============================================
 //頂点情報(2D)の構造体を定義
+//=============================================
 typedef struct
 {
 	D3DXVECTOR3 pos; //頂点座標
@@ -42,7 +43,9 @@ typedef struct
 	D3DXVECTOR2 tex; //テクスチャ
 }VERTEX_2D;
 
+//=============================================
 //頂点情報(3D)の構造体を定義
+//=============================================
 typedef struct
 {
 	D3DXVECTOR3 pos; //頂点座標
@@ -51,6 +54,9 @@ typedef struct
 	D3DXVECTOR2 tex; //テクスチャ
 }VERTEX_3D;
 
+//=============================================
+//モデル読み込みの構想体の定義
+//=============================================
 typedef struct
 {
 	D3DXVECTOR3 pos;
@@ -63,7 +69,21 @@ typedef struct
 	bool bUseGame;
 }ModelInfo;
 
+//=============================================
+//壁読み込みの構想体の定義
+//=============================================
+typedef struct
+{
+	D3DXVECTOR3 pos;
+	D3DXVECTOR3 rot;
+	int nType;
+	bool bUse;
+	bool bUseGame;
+}WallInfo;
+
+//=============================================
 //プロトタイプ宣言
+//=============================================
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow);
 void Uninit(void);
