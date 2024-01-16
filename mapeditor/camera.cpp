@@ -75,6 +75,17 @@ void UpdateCamera(void)
 		g_Camera.rot.y = D3DX_PI;
 	}
 
+	if (g_Camera.rot.x > D3DX_PI)
+	{
+		g_Camera.rot.x = -D3DX_PI - 0.01f;
+		//		g_Camera.rot.y -= D3DX_PI* 2.0f;
+	}
+
+	if (g_Camera.rot.x < -D3DX_PI)
+	{
+		g_Camera.rot.x = D3DX_PI + 0.01f;
+	}
+
 	//D3DXVec3Normalize(&vec, &vec);
 
 	//g_Camera.fAngle = atan2f(x, z) + ((D3DX_PI * 0.05f) * vec.x);
@@ -198,6 +209,19 @@ void UpdateCamera(void)
 			g_Camera.rot.y += 0.02f;
 			g_Camera.posV.x = g_Camera.posR.x - sinf(g_Camera.rot.y) * g_Camera.fLength;
 			g_Camera.posV.z = g_Camera.posR.z - cosf(g_Camera.rot.y) * g_Camera.fLength;
+		}
+
+		if (GetKeyboardPress(DIK_T) == true)
+		{
+			g_Camera.rot.x += 0.02f;
+			g_Camera.posV.y = g_Camera.posR.y - sinf(g_Camera.rot.x) * g_Camera.fLength;
+			g_Camera.posV.z = g_Camera.posR.z - cosf(g_Camera.rot.x) * g_Camera.fLength;
+		}
+		if (GetKeyboardPress(DIK_Y) == true)
+		{
+			g_Camera.rot.x -= 0.02f;
+			g_Camera.posV.y = g_Camera.posR.y - sinf(g_Camera.rot.x) * g_Camera.fLength;
+			g_Camera.posV.z = g_Camera.posR.z - cosf(g_Camera.rot.x) * g_Camera.fLength;
 		}
 	}
 

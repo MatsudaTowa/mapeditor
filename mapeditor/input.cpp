@@ -164,7 +164,6 @@ HRESULT InitMouse(HINSTANCE hInstance, HWND hWnd)
 	diprop.diph.dwHow = DIPH_DEVICE;
 	diprop.dwData = DIPROPAXISMODE_REL;
 
-
 	if (FAILED(g_pDIMouse->SetProperty(DIPROP_AXISMODE, &diprop.diph)))
 	{
 		// デバイスの設定に失敗
@@ -212,7 +211,7 @@ void UpdateMouse(void)
 	{
 
 		//g_zdiMouseStateTrigger = (g_zdiMouseState ^ zdiMouseState) & zdiMouseState;
-		g_zdiMouseState = zdiMouseState; //キーボードのプレス情報を保存
+		g_zdiMouseState = zdiMouseState; //マウスのプレス情報を保存
 
 	}
 	else
@@ -235,18 +234,18 @@ void UpdateMouse(void)
 
 	//ZeroMemory(&pMouseMove, sizeof(POINT));
 
-	D3DXVECTOR3 OldMousePos = g_MousePos;
+	//D3DXVECTOR3 OldMousePos = g_MousePos;
 
-	POINT pMouseMove;
+	//POINT pMouseMove;
 
-	GetCursorPos(&pMouseMove);
+	////GetCursorPos(&pMouseMove);
 
-	g_MousePos.x = (float)pMouseMove.x;
-	g_MousePos.y = (float)pMouseMove.y;
+	//g_MousePos.x = (float)pMouseMove.x;
+	//g_MousePos.y = (float)pMouseMove.y;
 
-	g_MouseMove.x = g_MousePos.x - OldMousePos.x;
-	g_MouseMove.y = g_MousePos.y - OldMousePos.y;
-	g_MouseMove.z = g_MousePos.z - OldMousePos.z;
+	//g_MouseMove.x = g_MousePos.x - OldMousePos.x;
+	//g_MouseMove.y = g_MousePos.y - OldMousePos.y;
+	//g_MouseMove.z = g_MousePos.z - OldMousePos.z;
 
 }
 
@@ -265,8 +264,6 @@ DIMOUSESTATE GetMouseState(void)
 {
 	return g_zdiMouseState;
 }
-
-
 
 //===========================================================================================================================================================================
 //PAD
