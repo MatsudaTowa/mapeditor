@@ -185,3 +185,17 @@ void DrawWall(void)
 	}
 }
 
+void SetWall(D3DXVECTOR3 pos, int nType)
+{
+	for (int nCnt = 0; nCnt < MAX_WALL; nCnt++)
+	{
+		if (g_aWall[nCnt].bUse == false)
+		{
+			g_aWall[nCnt].pos = pos;
+			g_aWall[nCnt].nType = nType;
+			g_aWall[nCnt].bUse = true;
+			break;
+		}
+	}
+}
+

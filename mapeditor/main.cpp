@@ -36,9 +36,11 @@ int g_nCntFPS = 0;
 bool g_bWireFrame; //ワイヤーフレーム
 bool g_bEdit; //エディットしてるか
 bool g_bReSave; //再配置
-int g_nUseModel;
+int g_nUseModel; //モデルの使用数読み込み
+int g_nUseWall; //壁の使用数読み込み
 int g_ModelCnt;
 ModelInfo g_aModelInfo[MAX_MODEL];
+WallInfo g_aWallInfo[MAX_WALL];
 
 //=============================================
 //メイン関数
@@ -247,6 +249,8 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 
 	InitWall();
 
+	LoadWall();
+
 	InitModel();
 
 	LoadModel();
@@ -413,6 +417,8 @@ void Draw(void)
 
 		DebagEdit();
 
+		DebagInfo();
+
 		//描画終了
 		g_pD3DDevice->EndScene();
 	}
@@ -558,6 +564,38 @@ void LoadModel(void)
 	for (int nCnt = 0; nCnt < g_nUseModel; nCnt++)
 	{
 		SetModel(g_aModelInfo[nCnt].pos, g_aModelInfo[nCnt].rot, g_aModelInfo[nCnt].nType);
+	}
+}
+
+//=============================================
+//ロード
+//=============================================
+void LoadWall(void)
+{
+	//ファイルの読み込み
+	FILE* pFile = fopen(WALL_FILE_BIN, "rb");
+
+	if (pFile != NULL)
+	{
+		//敵の使用してる数の読み込み
+		fread(&g_nUseWall, sizeof(int), 1, pFile);
+
+		//敵の使用数分、敵の読み込み
+		fread(&g_aWallInfo[0], sizeof(ModelInfo), g_nUseWall, pFile);
+
+		//ファイルを閉じる
+		fclose(pFile);
+
+	}
+
+	else
+	{
+		return;
+	}
+
+	for (int nCnt = 0; nCnt < g_nUseWall; nCnt++)
+	{
+		SetWall(g_aWallInfo[nCnt].pos, g_aModelInfo[nCnt].nType);
 	}
 }
 

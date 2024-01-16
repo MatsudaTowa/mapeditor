@@ -205,21 +205,33 @@ void UpdateMouse(void)
 {
 	BYTE aMouseState[NUM_MOUSE_MAX]; //入力情報
 	DIMOUSESTATE zdiMouseState;
-	int nCntMouse;
-	for (nCntMouse = 0; nCntMouse < NUM_MOUSE_MAX; nCntMouse++)
-	{
-		//入力デバイスからデータを取得
-		if (SUCCEEDED(g_pDIMouse->GetDeviceState(sizeof(zdiMouseState), &zdiMouseState)))
-		{
+	int nCntMouseButton;
 
-			g_zdiMouseStateTrigger.rgbButtons[nCntMouse] = (g_zdiMouseState.rgbButtons[nCntMouse] ^ zdiMouseState.rgbButtons[nCntMouse]) & zdiMouseState.rgbButtons[nCntMouse];
-			g_zdiMouseState.rgbButtons[nCntMouse] = zdiMouseState.rgbButtons[nCntMouse]; //キーボードのプレス情報を保存
-		}
-		else
-		{
-			g_pDIMouse->Acquire(); //キーボードのアクセス権を獲得
-		}
+	//入力デバイスからデータを取得
+	if (SUCCEEDED(g_pDIMouse->GetDeviceState(sizeof(zdiMouseState), &zdiMouseState)))
+	{
+
+		//g_zdiMouseStateTrigger = (g_zdiMouseState ^ zdiMouseState) & zdiMouseState;
+		g_zdiMouseState = zdiMouseState; //キーボードのプレス情報を保存
+
 	}
+	else
+	{
+		g_pDIMouse->Acquire(); //マウスのアクセス権を獲得
+
+	}
+
+	//ボタンの取得
+	for (nCntMouseButton = 0; nCntMouseButton < NUM_MOUSE_MAX; nCntMouseButton++)
+	{
+
+		/*
+		DIMOUSESTATE構造体の中に使ってない変数がある。
+		*/
+	}
+
+
+
 
 	//ZeroMemory(&pMouseMove, sizeof(POINT));
 
@@ -249,9 +261,9 @@ bool GetMouseTrigger(int nKey)
 {
 	return(g_zdiMouseStateTrigger.rgbButtons[nKey] & 0x80) != 0;
 }
-D3DXVECTOR3 GetMouseMove(void)
+DIMOUSESTATE GetMouseState(void)
 {
-	return(g_MouseMove);
+	return g_zdiMouseState;
 }
 
 

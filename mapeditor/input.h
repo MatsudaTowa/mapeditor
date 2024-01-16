@@ -75,7 +75,7 @@ void UninitMouse(void);
 void UpdateMouse(void);
 bool GetMousePress(int nKey);
 bool GetMouseTrigger(int nKey);
-D3DXVECTOR3 GetMouseMove(void);
+DIMOUSESTATE GetMouseState(void);
 //void GetMouseState(HWND hWnd);
 
 

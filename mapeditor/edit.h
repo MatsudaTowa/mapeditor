@@ -17,6 +17,7 @@ typedef enum
 	EDITTYPE_MODEL = 0,
 	EDITTYPE_CORRECTIONMODEL,
 	EDITTYPE_WALL,
+	EDITTYPE_CORRECTIONWALL,
 	EDITTYPE_MAX,
 }EDITTYPE;
 
@@ -61,14 +62,15 @@ typedef struct
 void InitEdit(void);
 void UninitEdit(void);
 void UpdateEdit(void);
-void SaveWall(void);
-void CorrectionWall(void);
-void reSaveWall(void);
 void SaveModel(void);
 void CorrectionModel(void);
 void reSaveModel(void);
+void SaveWall(void);
+void CorrectionWall(void);
+void reSaveWall(void);
 void DrawEdit(void);
 void DebagEdit(void);
+void DebagInfo(void);
 EditModelInfo* GetEditModelinfo(void);
 //D3DXVECTOR3 GetEditCameraPos(void);
 

@@ -30,6 +30,7 @@
 #define FVF_VERTEX_3D	(D3DFVF_XYZ |D3DFVF_NORMAL| D3DFVF_DIFFUSE |D3DFVF_TEX1) //座標とカラーとテクスチャ
 #define TXT_MAX	(6000)
 #define MODEL_FILE_BIN	"data\\Model.bin"
+#define WALL_FILE_BIN	"data\\Wall.bin"
 #define FILE_RANKING	"data\\rankingdata.txt"
 
 //=============================================
@@ -90,6 +91,7 @@ void Uninit(void);
 void Update(void);
 void Draw(void);
 void LoadModel(void);
+void LoadWall(void);
 LPDIRECT3DDEVICE9 GetDevice(void);
 LPD3DXFONT GetFont(void);
 void WireFrame(void);
