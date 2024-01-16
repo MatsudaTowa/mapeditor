@@ -595,7 +595,7 @@ void LoadWall(void)
 
 	for (int nCnt = 0; nCnt < g_nUseWall; nCnt++)
 	{
-		SetWall(g_aWallInfo[nCnt].pos, g_aModelInfo[nCnt].nType);
+		SetWall(g_aWallInfo[nCnt].pos, g_aWallInfo[nCnt].rot,g_aModelInfo[nCnt].nType);
 	}
 }
 

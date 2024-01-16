@@ -26,9 +26,8 @@ typedef struct
 void InitWall(void);
 void UninitWall(void);
 void UpdateWall(void);
-void ColisionWall(void);
 void DrawWall(void);
-void SetWall(D3DXVECTOR3 pos, int nType);
+void SetWall(D3DXVECTOR3 pos,D3DXVECTOR3 rot, int nType);
 
 
 #endif // _POLYGON_H_ //’è‹`‚³‚ê‚Ä‚È‚©‚Á‚½‚ç

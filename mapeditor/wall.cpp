@@ -37,25 +37,20 @@ void InitWall(void)
 		&g_pTextureWall
 	);
 
-
-	g_aWall[0].pos = D3DXVECTOR3(0.0f, 0.0f, 500.0f); //プレイヤーの初期位置
-	g_aWall[0].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f); 
-
-	g_aWall[1].pos = D3DXVECTOR3(500.0f, 0.0f, 0.0f); //プレイヤーの初期位置
-	g_aWall[1].rot = D3DXVECTOR3(0.0f, 1.57f, 0.0f); 
-
-	g_aWall[2].pos = D3DXVECTOR3(-500.0f, 0.0f, 0.0f); //プレイヤーの初期位置
-	g_aWall[2].rot = D3DXVECTOR3(0.0f, -1.57f, 0.0f);
-
-	g_aWall[3].pos = D3DXVECTOR3(0.0f, 0.0f, -500.0f); //プレイヤーの初期位置
-	g_aWall[3].rot = D3DXVECTOR3(0.0f, 3.14f, 0.0f);
-
 	pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * 4 * MAX_WALL, 
 		D3DUSAGE_WRITEONLY, 
 		FVF_VERTEX_3D, 
 		D3DPOOL_MANAGED,
 		&g_pVtxBuffWall, 
 		NULL);
+
+	for (int nCnt = 0; nCnt < MAX_WALL; nCnt++)
+	{
+		g_aWall[nCnt].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		g_aWall[nCnt].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		g_aWall[nCnt].nType = 0;
+		g_aWall[nCnt].bUse = false;
+	}
 
 	VERTEX_3D* pVtx;
 
@@ -152,46 +147,50 @@ void DrawWall(void)
 
 	for (int nCnt = 0; nCnt < MAX_WALL; nCnt++)
 	{
-		//マトリックスの初期化
-		D3DXMatrixIdentity(&g_mtxWorldWall);
+		if (g_aWall[nCnt].bUse == true)
+		{
+			//マトリックスの初期化
+			D3DXMatrixIdentity(&g_mtxWorldWall);
 
-		//向きを反映
-		D3DXMatrixRotationYawPitchRoll(&mtxRot, g_aWall[nCnt].rot.y, g_aWall[nCnt].rot.x, g_aWall[nCnt].rot.z);
+			//向きを反映
+			D3DXMatrixRotationYawPitchRoll(&mtxRot, g_aWall[nCnt].rot.y, g_aWall[nCnt].rot.x, g_aWall[nCnt].rot.z);
 
-		D3DXMatrixMultiply(&g_mtxWorldWall, &g_mtxWorldWall, &mtxRot);
+			D3DXMatrixMultiply(&g_mtxWorldWall, &g_mtxWorldWall, &mtxRot);
 
-		//位置を反映
-		D3DXMatrixTranslation(&mtxTrans, g_aWall[nCnt].pos.x, g_aWall[nCnt].pos.y, g_aWall[nCnt].pos.z);
+			//位置を反映
+			D3DXMatrixTranslation(&mtxTrans, g_aWall[nCnt].pos.x, g_aWall[nCnt].pos.y, g_aWall[nCnt].pos.z);
 
-		D3DXMatrixMultiply(&g_mtxWorldWall, &g_mtxWorldWall, &mtxTrans);
+			D3DXMatrixMultiply(&g_mtxWorldWall, &g_mtxWorldWall, &mtxTrans);
 
-		//ワールドマトリックスの設定
-		pDevice->SetTransform(D3DTS_WORLD, &g_mtxWorldWall);
+			//ワールドマトリックスの設定
+			pDevice->SetTransform(D3DTS_WORLD, &g_mtxWorldWall);
 
-		//頂点バッファをデータストリームに設定
-		pDevice->SetStreamSource(0, g_pVtxBuffWall, 0, sizeof(VERTEX_3D));
+			//頂点バッファをデータストリームに設定
+			pDevice->SetStreamSource(0, g_pVtxBuffWall, 0, sizeof(VERTEX_3D));
 
-		//頂点フォーマットの設定
-		pDevice->SetFVF(FVF_VERTEX_3D);
+			//頂点フォーマットの設定
+			pDevice->SetFVF(FVF_VERTEX_3D);
 
-		//テクスチャの設定
-		pDevice->SetTexture(0, g_pTextureWall);
+			//テクスチャの設定
+			pDevice->SetTexture(0, g_pTextureWall);
 
-		//ポリゴンの描画
-		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4 * nCnt, 2);
+			//ポリゴンの描画
+			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4 * nCnt, 2);
 
-		pDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
-		pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+			pDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+			pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+		}
 	}
 }
 
-void SetWall(D3DXVECTOR3 pos, int nType)
+void SetWall(D3DXVECTOR3 pos, D3DXVECTOR3 rot,int nType)
 {
 	for (int nCnt = 0; nCnt < MAX_WALL; nCnt++)
 	{
 		if (g_aWall[nCnt].bUse == false)
 		{
 			g_aWall[nCnt].pos = pos;
+			g_aWall[nCnt].rot = rot;
 			g_aWall[nCnt].nType = nType;
 			g_aWall[nCnt].bUse = true;
 			break;

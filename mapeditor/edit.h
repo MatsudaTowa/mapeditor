@@ -27,6 +27,7 @@ typedef enum
 typedef struct
 {
 	EDITTYPE EditType;
+	bool bCursorType;
 }Edit;
 
 //=============================================

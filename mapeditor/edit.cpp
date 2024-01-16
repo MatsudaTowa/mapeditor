@@ -75,6 +75,8 @@ void InitEdit(void)
 
 	//エディットの初期モード設定
 	g_Edit.EditType = EDITTYPE_MODEL;
+	//カーソルタイプ初期化(true:press,false:trigger)
+	g_Edit.bCursorType = true;
 
 	//モデルに書き込む情報の初期化
 	g_EditModelInfo[0].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -301,6 +303,11 @@ void UpdateEdit(void)
 		pCamera->posV = D3DXVECTOR3(0.0f, 1020.0f, -13.0f);
 		pCamera->posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f); //注視
 
+	}
+
+	if (GetKeyboardTrigger(DIK_F5) == true)
+	{
+		g_Edit.bCursorType = g_Edit.bCursorType ? false : true;
 	}
 }
 
@@ -575,21 +582,61 @@ void SaveWall(void)
 	VERTEX_3D* pVtx;
 	g_pVtxBuffWallEdit->Lock(0, 0, (void**)&pVtx, 0);
 
-	if (GetKeyboardTrigger(DIK_W) == true)
-	{
-		g_EditWallInfo[g_nEditWallNumber].pos.z += MOVE_CURSOR;
+	//壁のカーソル移動
+	if (g_Edit.bCursorType == true)
+	{//プレス
+		if (GetKeyboardPress(DIK_W) == true)
+		{
+			g_EditWallInfo[g_nEditWallNumber].pos.z += MOVE_CURSOR;
+		}
+		if (GetKeyboardPress(DIK_S) == true)
+		{
+			g_EditWallInfo[g_nEditWallNumber].pos.z -= MOVE_CURSOR;
+		}
+		if (GetKeyboardPress(DIK_A) == true)
+		{
+			g_EditWallInfo[g_nEditWallNumber].pos.x -= MOVE_CURSOR;
+		}
+		if (GetKeyboardPress(DIK_D) == true)
+		{
+			g_EditWallInfo[g_nEditWallNumber].pos.x += MOVE_CURSOR;
+		}
 	}
-	if (GetKeyboardTrigger(DIK_S) == true)
-	{
-		g_EditWallInfo[g_nEditWallNumber].pos.z -= MOVE_CURSOR;
+	else if (g_Edit.bCursorType == false)
+	{//トリガー
+		if (GetKeyboardTrigger(DIK_W) == true)
+		{
+			g_EditWallInfo[g_nEditWallNumber].pos.z += MOVE_CURSOR;
+		}
+		if (GetKeyboardTrigger(DIK_S) == true)
+		{
+			g_EditWallInfo[g_nEditWallNumber].pos.z -= MOVE_CURSOR;
+		}
+		if (GetKeyboardTrigger(DIK_A) == true)
+		{
+			g_EditWallInfo[g_nEditWallNumber].pos.x -= MOVE_CURSOR;
+		}
+		if (GetKeyboardTrigger(DIK_D) == true)
+		{
+			g_EditWallInfo[g_nEditWallNumber].pos.x += MOVE_CURSOR;
+		}
 	}
-	if (GetKeyboardTrigger(DIK_A) == true)
+	//壁のrot回転
+	if (GetKeyboardTrigger(DIK_C) == true)
 	{
-		g_EditWallInfo[g_nEditWallNumber].pos.x -= MOVE_CURSOR;
+		g_EditWallInfo[g_nEditWallNumber].rot.y += 1.57f;
+		if (g_EditWallInfo[g_nEditWallNumber].rot.y > D3DX_PI)
+		{
+			g_EditWallInfo[g_nEditWallNumber].rot.y = -D3DX_PI;
+		}
 	}
-	if (GetKeyboardTrigger(DIK_D) == true)
+	else if (GetKeyboardTrigger(DIK_Z) == true)
 	{
-		g_EditWallInfo[g_nEditWallNumber].pos.x += MOVE_CURSOR;
+		g_EditWallInfo[g_nEditWallNumber].rot.y -= 1.57f;
+		if (g_EditWallInfo[g_nEditWallNumber].rot.y < -D3DX_PI)
+		{
+			g_EditWallInfo[g_nEditWallNumber].rot.y = D3DX_PI;
+		}
 	}
 
 	if (GetKeyboardTrigger(DIK_RIGHT) == true)
