@@ -77,13 +77,13 @@ void UpdateCamera(void)
 
 	if (g_Camera.rot.x > D3DX_PI)
 	{
-		g_Camera.rot.x = -D3DX_PI - 0.01f;
+		g_Camera.rot.x = -D3DX_PI;
 		//		g_Camera.rot.y -= D3DX_PI* 2.0f;
 	}
 
 	if (g_Camera.rot.x < -D3DX_PI)
 	{
-		g_Camera.rot.x = D3DX_PI + 0.01f;
+		g_Camera.rot.x = D3DX_PI;
 	}
 
 	//D3DXVec3Normalize(&vec, &vec);
@@ -252,8 +252,9 @@ void UpdateCamera(void)
 void EditCamera(void)
 {
 	EditModelInfo* pEditModel = GetEditModelinfo();
+	Edit* pEdit = GetEdit();
 
-	g_Camera.posR = pEditModel[0].pos;
+	g_Camera.posR = pEditModel[pEdit->nEditModelNumber].pos;
 
 	if (GetKeyboardPress(DIK_Q) == true || GetJoypadPress(JOYKEY_X) == true)
 	{
@@ -268,15 +269,30 @@ void EditCamera(void)
 	if (GetKeyboardPress(DIK_U) == true || GetJoypadPress(JOYKEY_LB) == true)
 	{
 		g_Camera.rot.y -= 0.02f;
+		g_Camera.posV.x = g_Camera.posR.x - sinf(g_Camera.rot.y) * PLAYER_LENGTH_Z;
+		g_Camera.posV.z = g_Camera.posR.z - cosf(g_Camera.rot.y) * PLAYER_LENGTH_Z;
 	}
 
 	if (GetKeyboardPress(DIK_O) == true || GetJoypadPress(JOYKEY_RB) == true)
 	{
 		g_Camera.rot.y += 0.02f;
+		g_Camera.posV.x = g_Camera.posR.x - sinf(g_Camera.rot.y) * PLAYER_LENGTH_Z;
+		g_Camera.posV.z = g_Camera.posR.z - cosf(g_Camera.rot.y) * PLAYER_LENGTH_Z;
 	}
 
-	g_Camera.posV.x = g_Camera.posR.x - sinf(g_Camera.rot.y) * PLAYER_LENGTH_Z;
-	g_Camera.posV.z = g_Camera.posR.z - cosf(g_Camera.rot.y) * PLAYER_LENGTH_Z;
+	if (GetKeyboardPress(DIK_T) == true)
+	{
+		g_Camera.rot.x += 0.02f;
+		g_Camera.posV.y = g_Camera.posR.y - sinf(g_Camera.rot.x) * PLAYER_LENGTH_Z;
+		g_Camera.posV.z = g_Camera.posR.z - cosf(g_Camera.rot.x) * PLAYER_LENGTH_Z;
+	}
+	if (GetKeyboardPress(DIK_Y) == true)
+	{
+		g_Camera.rot.x -= 0.02f;
+		g_Camera.posV.y = g_Camera.posR.y - sinf(g_Camera.rot.x) * PLAYER_LENGTH_Z;
+		g_Camera.posV.z = g_Camera.posR.z - cosf(g_Camera.rot.x) * PLAYER_LENGTH_Z;
+	}
+
 }
 
 //=============================================

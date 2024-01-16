@@ -20,6 +20,8 @@ typedef struct
 	D3DXVECTOR3 pos;
 	D3DXVECTOR3 rot;
 	int nType;
+	float fWide;
+	float fHeight;
 	bool bUse;
 }Wall;
 
@@ -27,7 +29,7 @@ void InitWall(void);
 void UninitWall(void);
 void UpdateWall(void);
 void DrawWall(void);
-void SetWall(D3DXVECTOR3 pos,D3DXVECTOR3 rot, int nType);
+void SetWall(D3DXVECTOR3 pos,D3DXVECTOR3 rot, float fWide, float fHeight, int nType);
 
 
 #endif // _POLYGON_H_ //’è‹`‚³‚ê‚Ä‚È‚©‚Á‚½‚ç

@@ -78,6 +78,8 @@ typedef struct
 	D3DXVECTOR3 pos;
 	D3DXVECTOR3 rot;
 	int nType;
+	float fWide;
+	float fHeight;
 	bool bUse;
 	bool bUseGame;
 }WallInfo;

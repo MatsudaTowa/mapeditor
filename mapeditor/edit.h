@@ -28,6 +28,9 @@ typedef struct
 {
 	EDITTYPE EditType;
 	bool bCursorType;
+	int nEditModelNumber; //’Ç]‚·‚éƒJƒƒ‰‚Ì‘ÎÛ
+	int nEditWallNumber; //’Ç]‚·‚éƒJƒƒ‰‚Ì‘ÎÛ
+
 }Edit;
 
 //=============================================
@@ -53,6 +56,8 @@ typedef struct
 	D3DXVECTOR3 pos;
 	D3DXVECTOR3 rot;
 	int nType;
+	float fWide;
+	float fHeight;
 	bool bUse;
 	bool bUseGame;
 }EditWallInfo;
@@ -73,6 +78,7 @@ void DrawEdit(void);
 void DebagEdit(void);
 void DebagInfo(void);
 EditModelInfo* GetEditModelinfo(void);
+Edit* GetEdit(void);
 //D3DXVECTOR3 GetEditCameraPos(void);
 
 #endif // !_RESULT_H

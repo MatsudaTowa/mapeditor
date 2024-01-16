@@ -42,7 +42,7 @@ void InitModel(void);
 void UninitModel(void);
 void UpdateModel(void);
 void DrawModel(void);
-void SetModel(D3DXVECTOR3 pos, D3DXVECTOR3 rot, ModelType nType);
+void SetModel(D3DXVECTOR3 pos, D3DXVECTOR3 rot,ModelType nType);
 
 model* GetModel(void);
 

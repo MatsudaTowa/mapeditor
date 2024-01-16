@@ -38,7 +38,6 @@ typedef struct
 void InitCamera(void);
 void UninitCamera(void);
 void UpdateCamera(void);
-void PlayerCamera(void);
 void EditCamera(void);
 void TurnCamera(void);
 void SetCamera(void);

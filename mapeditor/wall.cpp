@@ -60,10 +60,10 @@ void InitWall(void)
 	for (int nCnt = 0; nCnt < MAX_WALL; nCnt++)
 	{
 		//頂点座標の設定
-		pVtx[0].pos = D3DXVECTOR3(-500.0f, 200.0f, 0.0f);
-		pVtx[1].pos = D3DXVECTOR3(500.0f, 200.0f, 0.0f);
-		pVtx[2].pos = D3DXVECTOR3(-500.0f, 0.0f, 0.0f);
-		pVtx[3].pos = D3DXVECTOR3(500.0f, 0.0f, 0.0f);
+		pVtx[0].pos = D3DXVECTOR3(-g_aWall[nCnt].fWide, g_aWall[nCnt].fHeight, 0.0f);
+		pVtx[1].pos = D3DXVECTOR3(g_aWall[nCnt].fWide, g_aWall[nCnt].fHeight, 0.0f);
+		pVtx[2].pos = D3DXVECTOR3(-g_aWall[nCnt].fWide, 0.0f, 0.0f);
+		pVtx[3].pos = D3DXVECTOR3(g_aWall[nCnt].fWide, 0.0f, 0.0f);
 
 		//法線ベクトルの設定
 		pVtx[0].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
@@ -114,25 +114,24 @@ void UninitWall(void)
 //=============================================
 void UpdateWall(void)
 {
-	/*if (GetKeyboardPress(DIK_UP) == true)
+
+	VERTEX_3D* pVtx;
+
+	//頂点バッファをロックし頂点情報へのポインタを取得
+	g_pVtxBuffWall->Lock(0, 0, (void**)&pVtx, 0);
+
+
+	for (int nCnt = 0; nCnt < MAX_WALL; nCnt++)
 	{
-		g_aWall.rot.x += 0.05f;
+		//頂点座標の設定
+		pVtx[0].pos = D3DXVECTOR3(-g_aWall[nCnt].fWide, g_aWall[nCnt].fHeight, 0.0f);
+		pVtx[1].pos = D3DXVECTOR3(g_aWall[nCnt].fWide, g_aWall[nCnt].fHeight, 0.0f);
+		pVtx[2].pos = D3DXVECTOR3(-g_aWall[nCnt].fWide, 0.0f, 0.0f);
+		pVtx[3].pos = D3DXVECTOR3(g_aWall[nCnt].fWide, 0.0f, 0.0f);
+		pVtx += 4;
 	}
 
-	if (GetKeyboardPress(DIK_DOWN) == true)
-	{
-		g_aWall.rot.x -= 0.05f;
-	}
-
-	if (GetKeyboardPress(DIK_RIGHT) == true)
-	{
-		g_aWall.rot.y -= 0.05f;
-	}
-
-	if (GetKeyboardPress(DIK_LEFT) == true)
-	{
-		g_aWall.rot.y += 0.05f;
-	}*/
+	g_pVtxBuffWall->Unlock();
 }
 
 //=============================================
@@ -183,7 +182,7 @@ void DrawWall(void)
 	}
 }
 
-void SetWall(D3DXVECTOR3 pos, D3DXVECTOR3 rot,int nType)
+void SetWall(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWide, float fHeight, int nType)
 {
 	for (int nCnt = 0; nCnt < MAX_WALL; nCnt++)
 	{
@@ -191,8 +190,11 @@ void SetWall(D3DXVECTOR3 pos, D3DXVECTOR3 rot,int nType)
 		{
 			g_aWall[nCnt].pos = pos;
 			g_aWall[nCnt].rot = rot;
+			g_aWall[nCnt].fWide = fWide;
+			g_aWall[nCnt].fHeight = fHeight;
 			g_aWall[nCnt].nType = nType;
 			g_aWall[nCnt].bUse = true;
+
 			break;
 		}
 	}
