@@ -8,6 +8,7 @@
 #include "model.h"
 #include "input.h"
 #include "camera.h"
+#include "wall.h"
 #include "cursor.h"
 #include <string.h>
 #include <stdio.h>
@@ -18,19 +19,23 @@
 #define EDIT_HEIGHT	(700) //敵を置ける最大値
 #define ENEMY_LIFE	(3) //敵のライフ
 #define TIME_CHANGE	(5) //時間を進める
-#define EDIT_SELECT	(2) //エディットセレクト数（敵・ブロック）
-#define NUM_TYPE_EDIT	(2) //エディットで置ける種類 (モデル)
+#define NUM_MODEL_EDIT	(2) //エディットで置ける種類 (モデル)
+#define MAX_WALL_EDIT	(1) //エディットで置ける種類 (壁)
 
 //=============================================
 //グローバル変数
 //=============================================
-LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffEdit = NULL;
-LPDIRECT3DTEXTURE9 g_apTextureEdit[NUM_TYPE_EDIT][NUM_TEXTURE] = {}; //テクスチャポインタ
+LPDIRECT3DTEXTURE9 g_apModelTextureEdit[NUM_MODEL_EDIT][NUM_TEXTURE] = {}; //テクスチャポインタ
+LPDIRECT3DTEXTURE9 g_apWallTextureEdit[MAX_WALL_EDIT] = {}; //テクスチャポインタ
 Edit g_Edit; //エディット情報
-LPD3DXMESH g_apMeshEditModel[NUM_MODEL];
-LPD3DXBUFFER g_apBuffMatEditModel[NUM_MODEL];
-DWORD g_anNumMatEditModel[NUM_MODEL];
+LPD3DXMESH g_apMeshEditModel[NUM_MODEL]; //モデルのメッシュ情報
+LPD3DXBUFFER g_apBuffMatEditModel[NUM_MODEL]; //モデルの頂点バッファ情報
+DWORD g_anNumMatEditModel[NUM_MODEL]; //モデルのマテリアル情報
 EditModelInfo g_EditModelInfo[MAX_MODEL]; //モデルのエディット情報
+
+LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffWallEdit = NULL; //壁の頂点情報
+D3DXMATRIX	g_mtxWorldWallEdit; //壁のワールドマトリックス
+EditWallInfo g_EditWallInfo[MAX_WALL]; //壁のエディット情報
 
 bool g_bSave = true; //セーブできるか
 int g_nSaveModelCnt;
@@ -49,6 +54,14 @@ static const char* MODEL_NAME[NUM_MODEL] =
 };
 
 //=============================================
+//壁のテクスチャの種類
+//=============================================
+static const char* WALL_TEX_NAME[NUM_WALL] =
+{
+	"data\\TEXTURE\\snow.jpg",
+};
+
+//=============================================
 //エディットの初期化処理
 //=============================================
 void InitEdit(void)
@@ -58,9 +71,10 @@ void InitEdit(void)
 	//デバイスの取得
 	pDevice = GetDevice();
 
+	//エディットの初期モード設定
 	g_Edit.EditType = EDITTYPE_MODEL;
 
-	//ブロックに書き込む情報の初期化
+	//モデルに書き込む情報の初期化
 	g_EditModelInfo[0].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	g_EditModelInfo[0].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	g_EditModelInfo[0].nType = 0;
@@ -101,7 +115,7 @@ void InitEdit(void)
 				//テクスチャの読み込み
 				D3DXCreateTextureFromFile(pDevice,
 					pMat[nCntMat].pTextureFilename,
-					&g_apTextureEdit[nCnt][nCntMat]
+					&g_apModelTextureEdit[nCnt][nCntMat]
 				);
 			}
 		}
@@ -113,55 +127,68 @@ void InitEdit(void)
 	g_nSaveModelCnt = 0;
 	g_nSave = 0;
 
+	for (int nCntWallTex = 0; nCntWallTex < NUM_WALL; nCntWallTex++)
+	{
+		//テクスチャの読み込み
+		D3DXCreateTextureFromFile(pDevice,
+			WALL_TEX_NAME[nCntWallTex],
+			&g_apWallTextureEdit[nCntWallTex]
+		);
+	}
+
+	//壁に書き込む情報の初期化
+	g_EditWallInfo[0].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	g_EditWallInfo[0].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	g_EditWallInfo[0].nType = 0;
+	g_EditWallInfo[0].bUse = true;
+	g_EditWallInfo[0].bUseGame = true;
+
+	for (int nCnt = 1; nCnt < MAX_MODEL; nCnt++)
+	{
+		g_EditWallInfo[nCnt].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		g_EditWallInfo[nCnt].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		g_EditWallInfo[nCnt].nType = 0;
+		g_EditWallInfo[nCnt].bUse = false;
+		g_EditWallInfo[nCnt].bUseGame = false;
+	}
+
 	//頂点バッファの生成
-	pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * 4 * MAX_MODEL, D3DUSAGE_WRITEONLY, 4, D3DPOOL_MANAGED, &g_pVtxBuffEdit, NULL);
+	pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * 4 * MAX_MODEL, D3DUSAGE_WRITEONLY, 4, D3DPOOL_MANAGED, &g_pVtxBuffWallEdit, NULL);
 
 	VERTEX_3D* pVtx;
 	//頂点バッファをロックし頂点情報へのポインタを取得
-	g_pVtxBuffEdit->Lock(0, 0, (void**)&pVtx, 0);
+	g_pVtxBuffWallEdit->Lock(0, 0, (void**)&pVtx, 0);
 	for (int nCnt = 0; nCnt < MAX_MODEL; nCnt++)
 	{
 		//頂点座標の設定
-		pVtx[0].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-		pVtx[1].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-		pVtx[2].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-		pVtx[3].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		pVtx[0].pos = D3DXVECTOR3(-500.0f, 200.0f, 0.0f);
+		pVtx[1].pos = D3DXVECTOR3(500.0f, 200.0f, 0.0f);
+		pVtx[2].pos = D3DXVECTOR3(-500.0f, 0.0f, 0.0f);
+		pVtx[3].pos = D3DXVECTOR3(500.0f, 0.0f, 0.0f);
 
 		//法線ベクトルの設定
-		pVtx[0].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-		pVtx[1].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-		pVtx[2].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-		pVtx[3].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+		pVtx[0].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+		pVtx[1].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+		pVtx[2].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+		pVtx[3].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
 
 		//頂点カラーの設定
-		pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlpha);
-		pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlpha);
-		pVtx[2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlpha);
-		pVtx[3].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlpha);
+		pVtx[0].col = D3DCOLOR_RGBA(255, 255, 255, 255);
+		pVtx[1].col = D3DCOLOR_RGBA(255, 255, 255, 255);
+		pVtx[2].col = D3DCOLOR_RGBA(255, 255, 255, 255);
+		pVtx[3].col = D3DCOLOR_RGBA(255, 255, 255, 255);
 
-
-		//if (g_EditModelInfo[g_nSaveModelCnt].nType == BLOCKTYPE_SNOW)
-		//{
-		//	//テクスチャ座標の設定
-		//	pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-		//	pVtx[1].tex = D3DXVECTOR2(0.5f, 0.0f);
-		//	pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-		//	pVtx[3].tex = D3DXVECTOR2(0.5f, 1.0f);
-		//}
-		//else
-		//{
-			//テクスチャ座標の設定
-			pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-			pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
-			pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-			pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
-		//}
+		//テクスチャの座標指定
+		pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
+		pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
+		pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
+		pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
 
 		pVtx += 4;
 	}
 
 	//頂点バッファをアンロック
-	g_pVtxBuffEdit->Unlock();
+	g_pVtxBuffWallEdit->Unlock();
 }
 
 //=============================================
@@ -237,6 +264,27 @@ void UpdateEdit(void)
 }
 
 //=============================================
+//壁のセーブ処理
+//=============================================
+void SaveWall(void)
+{
+}
+
+//=============================================
+//壁の編集
+//=============================================
+void CorrectionWall(void)
+{
+}
+
+//=============================================
+//壁の途中からセーブ処理
+//=============================================
+void reSaveWall(void)
+{
+}
+
+//=============================================
 //モデルのセーブ処理
 //=============================================
 void SaveModel(void)
@@ -248,7 +296,7 @@ void SaveModel(void)
 
 	//Enemy* pEnemy = GetEnemy();
 	VERTEX_3D* pVtx;
-	g_pVtxBuffEdit->Lock(0, 0, (void**)&pVtx, 0);
+	g_pVtxBuffWallEdit->Lock(0, 0, (void**)&pVtx, 0);
 
 	if (GetKeyboardPress(DIK_W) == true)
 	{
@@ -363,7 +411,7 @@ void CorrectionModel(void)
 
 	//Enemy* pEnemy = GetEnemy();
 	VERTEX_3D* pVtx;
-	g_pVtxBuffEdit->Lock(0, 0, (void**)&pVtx, 0);
+	g_pVtxBuffWallEdit->Lock(0, 0, (void**)&pVtx, 0);
 
 	if (GetKeyboardTrigger(DIK_UP) == true)
 	{
@@ -458,7 +506,7 @@ void CorrectionModel(void)
 	}
 }
 //=============================================
-//敵の途中からセーブ処理
+//モデルの途中からセーブ処理
 //=============================================
 void reSaveModel(void)
 {
@@ -545,7 +593,7 @@ void DrawEdit(void)
 				pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
 
 				//テクスチャの設定
-				pDevice->SetTexture(0,g_apTextureEdit[g_EditModelInfo[nCnt].nType][nCntMat]);
+				pDevice->SetTexture(0,g_apModelTextureEdit[g_EditModelInfo[nCnt].nType][nCntMat]);
 
 				//パーツの設定
 				g_apMeshEditModel[g_EditModelInfo[nCnt].nType]->DrawSubset(nCntMat);

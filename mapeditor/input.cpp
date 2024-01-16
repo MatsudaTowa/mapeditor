@@ -391,6 +391,8 @@ bool GetJoypadRepeat(JOYKEY key)
 			return true;
 		}
 	}
+
+	// ‚±‚±‚â‚Î‚·‚¬‚é
 }
 
 void UpdateStick(void)

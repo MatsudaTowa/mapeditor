@@ -12,18 +12,13 @@
 //#include"bullet.h"
 
 //=============================================
-//マクロ定義
-//=============================================
-#define NUM_WALL	(4) //壁の数
-
-//=============================================
 //グローバル変数
 //=============================================
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffWall = NULL;
 LPDIRECT3DTEXTURE9 g_pTextureWall = NULL; //テクスチャポインタ
 //D3DXVECTOR3 g_movewall; //移動量
 D3DXMATRIX	g_mtxWorldWall;
-Wall g_aWall[NUM_WALL];
+Wall g_aWall[MAX_WALL];
 
 
 //=============================================
@@ -55,7 +50,7 @@ void InitWall(void)
 	g_aWall[3].pos = D3DXVECTOR3(0.0f, 0.0f, -500.0f); //プレイヤーの初期位置
 	g_aWall[3].rot = D3DXVECTOR3(0.0f, 3.14f, 0.0f);
 
-	pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * 4 * NUM_WALL, 
+	pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * 4 * MAX_WALL, 
 		D3DUSAGE_WRITEONLY, 
 		FVF_VERTEX_3D, 
 		D3DPOOL_MANAGED,
@@ -67,7 +62,7 @@ void InitWall(void)
 	//頂点バッファをロックし頂点情報へのポインタを取得
 	g_pVtxBuffWall->Lock(0, 0, (void**)&pVtx, 0);
 
-	for (int nCnt = 0; nCnt < NUM_WALL; nCnt++)
+	for (int nCnt = 0; nCnt < MAX_WALL; nCnt++)
 	{
 		//頂点座標の設定
 		pVtx[0].pos = D3DXVECTOR3(-500.0f, 200.0f, 0.0f);
@@ -155,7 +150,7 @@ void DrawWall(void)
 
 	D3DXMATRIX mtxRot, mtxTrans; //計算用マトリックス
 
-	for (int nCnt = 0; nCnt < NUM_WALL; nCnt++)
+	for (int nCnt = 0; nCnt < MAX_WALL; nCnt++)
 	{
 		//マトリックスの初期化
 		D3DXMatrixIdentity(&g_mtxWorldWall);

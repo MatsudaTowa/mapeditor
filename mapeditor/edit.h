@@ -16,6 +16,7 @@ typedef enum
 {
 	EDITTYPE_MODEL = 0,
 	EDITTYPE_CORRECTIONMODEL,
+	EDITTYPE_WALL,
 	EDITTYPE_MAX,
 }EDITTYPE;
 
@@ -42,10 +43,27 @@ typedef struct
 	bool bUseGame; 
 }EditModelInfo;
 
+//=============================================
+//壁エディットの構想体の定義
+//=============================================
+typedef struct
+{
+	D3DXVECTOR3 pos;
+	D3DXVECTOR3 rot;
+	int nType;
+	bool bUse;
+	bool bUseGame;
+}EditWallInfo;
+
+//=============================================
 //プロトタイプ宣言
+//=============================================
 void InitEdit(void);
 void UninitEdit(void);
 void UpdateEdit(void);
+void SaveWall(void);
+void CorrectionWall(void);
+void reSaveWall(void);
 void SaveModel(void);
 void CorrectionModel(void);
 void reSaveModel(void);
