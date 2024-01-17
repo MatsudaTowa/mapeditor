@@ -11,6 +11,8 @@
 
 #define NUM_FIELD	(1) //フィールドの種類
 #define MAX_FIELD	(256) //フィールドの種類
+#define FIELD_WIDE	(500)
+#define FIELD_DEPTH	(500)
 
 typedef struct
 {
@@ -26,6 +28,7 @@ void InitField(void);
 void UninitField(void);
 void UpdateField(void);
 void DrawField(void);
+void SetField(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWide, float fDepth, int nType);
 D3DXVECTOR3 GetFieldPos(void);
 
 #endif // _FIELD_H_ //定義されてなかったら

@@ -10,13 +10,7 @@
 //#include "enemy.h"
 //#include "Screen.h"
 //#include"bullet.h"
-
-//=============================================
-//マクロ定義
-//=============================================
-#define FIELD_WIDE	(500)
-#define FIELD_DEPTH	(500)
-
+// 
 //=============================================
 //グローバル変数
 //=============================================
@@ -24,7 +18,7 @@ LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffField = NULL;
 LPDIRECT3DTEXTURE9 g_pTextureField = NULL; //テクスチャポインタ
 //D3DXVECTOR3 g_movefield; //移動量
 D3DXMATRIX	g_mtxWorldField;
-Field g_field[MAX_FIELD];
+Field g_afield[MAX_FIELD];
 
 //=============================================
 //ポリゴンの初期化処理
@@ -44,11 +38,11 @@ void InitField(void)
 
 	for (int nCnt = 0; nCnt < MAX_FIELD; nCnt++)
 	{
-		g_field[nCnt].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f); //床の初期位置
-		g_field[nCnt].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f); //床の初期方向
-		g_field[nCnt].fWide = FIELD_WIDE; //床の横幅
-		g_field[nCnt].fDepth = FIELD_DEPTH; //床の縦幅
-		g_field[nCnt].bUse = false;
+		g_afield[nCnt].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f); //床の初期位置
+		g_afield[nCnt].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f); //床の初期方向
+		g_afield[nCnt].fWide = FIELD_WIDE; //床の横幅
+		g_afield[nCnt].fDepth = FIELD_DEPTH; //床の縦幅
+		g_afield[nCnt].bUse = false;
 	}
 	pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * 4 * MAX_FIELD, D3DUSAGE_WRITEONLY, FVF_VERTEX_3D, D3DPOOL_MANAGED, &g_pVtxBuffField, NULL);
 
@@ -113,25 +107,23 @@ void UninitField(void)
 //=============================================
 void UpdateField(void)
 {
-	//if (GetKeyboardPress(DIK_UP) == true)
-	//{
-	//	g_rotField.x += 0.05f;
-	//}
+	VERTEX_3D* pVtx;
 
-	//if (GetKeyboardPress(DIK_DOWN) == true)
-	//{
-	//	g_rotField.x -= 0.05f;
-	//}
+	//頂点バッファをロックし頂点情報へのポインタを取得
+	g_pVtxBuffField->Lock(0, 0, (void**)&pVtx, 0);
 
-	//if (GetKeyboardPress(DIK_RIGHT) == true)
-	//{
-	//	g_rotField.y -= 0.05f;
-	//}
 
-	//if (GetKeyboardPress(DIK_LEFT) == true)
-	//{
-	//	g_rotField.y += 0.05f;
-	//}
+	for (int nCnt = 0; nCnt < MAX_FIELD; nCnt++)
+	{
+		//頂点座標の設定
+		pVtx[0].pos = D3DXVECTOR3(-g_afield[nCnt].fWide, 0.0f, g_afield[nCnt].fDepth);
+		pVtx[1].pos = D3DXVECTOR3(g_afield[nCnt].fWide, 0.0f, g_afield[nCnt].fDepth);
+		pVtx[2].pos = D3DXVECTOR3(-g_afield[nCnt].fWide, 0.0f, -g_afield[nCnt].fDepth);
+		pVtx[3].pos = D3DXVECTOR3(g_afield[nCnt].fWide, 0.0f, -g_afield[nCnt].fDepth);
+		pVtx += 4;
+	}
+
+	g_pVtxBuffField->Unlock();
 }
 
 //=============================================
@@ -146,18 +138,18 @@ void DrawField(void)
 
 	for (int nCnt = 0; nCnt < MAX_FIELD; nCnt++)
 	{
-		if (g_field[nCnt].bUse == true)
+		if (g_afield[nCnt].bUse == true)
 		{
 			//マトリックスの初期化
 			D3DXMatrixIdentity(&g_mtxWorldField);
 
 			//向きを反映
-			D3DXMatrixRotationYawPitchRoll(&mtxRot, g_field[nCnt].rot.y, g_field[nCnt].rot.x, g_field[nCnt].rot.z);
+			D3DXMatrixRotationYawPitchRoll(&mtxRot, g_afield[nCnt].rot.y, g_afield[nCnt].rot.x, g_afield[nCnt].rot.z);
 
 			D3DXMatrixMultiply(&g_mtxWorldField, &g_mtxWorldField, &mtxRot);
 
 			//位置を反映
-			D3DXMatrixTranslation(&mtxTrans, g_field[nCnt].pos.x, g_field[nCnt].pos.y, g_field[nCnt].pos.z);
+			D3DXMatrixTranslation(&mtxTrans, g_afield[nCnt].pos.x, g_afield[nCnt].pos.y, g_afield[nCnt].pos.z);
 
 			D3DXMatrixMultiply(&g_mtxWorldField, &g_mtxWorldField, &mtxTrans);
 
@@ -179,7 +171,27 @@ void DrawField(void)
 	}
 }
 
+//=============================================
+//ポリゴンの描画処理
+//=============================================
+void SetField(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWide, float fDepth, int nType)
+{
+	for (int nCnt = 0; nCnt < MAX_FIELD; nCnt++)
+	{
+		if (g_afield[nCnt].bUse == false)
+		{
+			g_afield[nCnt].pos = pos;
+			g_afield[nCnt].rot = rot;
+			g_afield[nCnt].fWide = fWide;
+			g_afield[nCnt].fDepth = fDepth;
+			g_afield[nCnt].nType = nType;
+			g_afield[nCnt].bUse = true;
+			break;
+		}
+	}
+}
+
 D3DXVECTOR3 GetFieldPos(void)
 {
-	return g_field->pos;
+	return g_afield->pos;
 }

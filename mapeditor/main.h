@@ -31,6 +31,7 @@
 #define TXT_MAX	(6000)
 #define MODEL_FILE_BIN	"data\\Model.bin"
 #define WALL_FILE_BIN	"data\\Wall.bin"
+#define FIELD_FILE_BIN	"data\\Field.bin"
 #define FILE_RANKING	"data\\rankingdata.txt"
 
 //=============================================
@@ -85,6 +86,20 @@ typedef struct
 }WallInfo;
 
 //=============================================
+//床読み込みの構想体の定義
+//=============================================
+typedef struct
+{
+	D3DXVECTOR3 pos;
+	D3DXVECTOR3 rot;
+	int nType;
+	float fWide;
+	float fDepth;
+	bool bUse;
+	bool bUseGame;
+}FieldInfo;
+
+//=============================================
 //プロトタイプ宣言
 //=============================================
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -94,6 +109,7 @@ void Update(void);
 void Draw(void);
 void LoadModel(void);
 void LoadWall(void);
+void LoadField(void);
 LPDIRECT3DDEVICE9 GetDevice(void);
 LPD3DXFONT GetFont(void);
 void WireFrame(void);

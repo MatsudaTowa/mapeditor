@@ -38,9 +38,11 @@ bool g_bEdit; //エディットしてるか
 bool g_bReSave; //再配置
 int g_nUseModel; //モデルの使用数読み込み
 int g_nUseWall; //壁の使用数読み込み
+int g_nUseField; //床の使用数読み込み
 int g_ModelCnt;
 ModelInfo g_aModelInfo[MAX_MODEL];
 WallInfo g_aWallInfo[MAX_WALL];
+FieldInfo g_aFieldInfo[MAX_FIELD];
 
 //=============================================
 //メイン関数
@@ -223,6 +225,9 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	g_bReSave = false; //再配置していない状態
 	g_ModelCnt = 0;
 	g_nUseModel = 0;
+	g_nUseWall = 0;
+	g_nUseField = 0; //床の使用数読み込み
+
 	//キーボードの初期化処理
 	if (FAILED(InitKeyboard(hInstance, hWnd)))
 	{
@@ -246,6 +251,8 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	InitLight();
 
 	InitField();
+
+	LoadField();
 
 	InitWall();
 
@@ -600,6 +607,38 @@ void LoadWall(void)
 	for (int nCnt = 0; nCnt < g_nUseWall; nCnt++)
 	{
 		SetWall(g_aWallInfo[nCnt].pos, g_aWallInfo[nCnt].rot,g_aWallInfo[nCnt].fWide, g_aWallInfo[nCnt].fHeight,g_aModelInfo[nCnt].nType);
+	}
+}
+
+//=============================================
+//ロード
+//=============================================
+void LoadField(void)
+{
+	//ファイルの読み込み
+	FILE* pFile = fopen(FIELD_FILE_BIN, "rb");
+
+	if (pFile != NULL)
+	{
+		//敵の使用してる数の読み込み
+		fread(&g_nUseField, sizeof(int), 1, pFile);
+
+		//敵の使用数分、敵の読み込み
+		fread(&g_aFieldInfo[0], sizeof(FieldInfo), g_nUseField, pFile);
+
+		//ファイルを閉じる
+		fclose(pFile);
+
+	}
+
+	else
+	{
+		return;
+	}
+
+	for (int nCnt = 0; nCnt < g_nUseField; nCnt++)
+	{
+		SetField(g_aFieldInfo[nCnt].pos, g_aFieldInfo[nCnt].rot, g_aFieldInfo[nCnt].fWide, g_aFieldInfo[nCnt].fDepth, g_aFieldInfo[nCnt].nType);
 	}
 }
 

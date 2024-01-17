@@ -18,6 +18,8 @@ typedef enum
 	EDITTYPE_CORRECTIONMODEL,
 	EDITTYPE_WALL,
 	EDITTYPE_CORRECTIONWALL,
+	EDITTYPE_FIELD,
+	EDITTYPE_CORRECTIONFIELD,
 	EDITTYPE_MAX,
 }EDITTYPE;
 
@@ -30,6 +32,7 @@ typedef struct
 	bool bCursorType;
 	int nEditModelNumber; //’Ç]‚·‚éƒJƒƒ‰‚Ì‘ÎÛ
 	int nEditWallNumber; //’Ç]‚·‚éƒJƒƒ‰‚Ì‘ÎÛ
+	int nEditFieldNumber; //’Ç]‚·‚éƒJƒƒ‰‚Ì‘ÎÛ
 
 }Edit;
 
