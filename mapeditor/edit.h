@@ -68,6 +68,7 @@ typedef struct
 void InitEdit(void);
 void UninitEdit(void);
 void UpdateEdit(void);
+void reSaveEdit(void);
 void SaveModel(void);
 void CorrectionModel(void);
 void reSaveModel(void);

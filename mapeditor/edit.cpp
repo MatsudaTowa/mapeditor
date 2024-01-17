@@ -282,13 +282,24 @@ void UpdateEdit(void)
 	}
 
 	else if (GetKeyboardTrigger(DIK_3) == true)
-	{//今まで置いたモデルの編集
+	{//壁を設置
 		g_Edit.EditType = EDITTYPE_WALL;
 		g_Edit.nEditWallNumber = g_nSaveWallCnt;
 
 		if (g_EditWallInfo[g_Edit.nEditWallNumber].bUseGame == false)
 		{
 			g_EditWallInfo[g_Edit.nEditWallNumber].bUse = true; //次に設置するものは表示しない
+		}
+	}
+
+	else if (GetKeyboardTrigger(DIK_4) == true)
+	{//今まで置いた壁の編集
+		g_Edit.EditType = EDITTYPE_CORRECTIONWALL;
+
+		if (g_EditWallInfo[g_Edit.nEditWallNumber].bUseGame == false)
+		{
+			g_EditWallInfo[g_Edit.nEditWallNumber].bUse = true; //次に設置するものは表示しない
+			g_Edit.nEditWallNumber--;
 		}
 	}
 
@@ -304,6 +315,10 @@ void UpdateEdit(void)
 	{//壁
 		SaveWall();
 	}
+	else if (g_Edit.EditType == EDITTYPE_CORRECTIONWALL)
+	{//壁置きなおし
+		CorrectionWall();
+	}
 
 	if (GetKeyboardTrigger(DIK_F1) == true)
 	{
@@ -317,6 +332,13 @@ void UpdateEdit(void)
 	{
 		g_Edit.bCursorType = g_Edit.bCursorType ? false : true;
 	}
+}
+
+//=============================================
+//再読み込み処理（管理）
+//=============================================
+void reSaveEdit(void)
+{
 }
 
 //=============================================
@@ -838,6 +860,276 @@ void SaveWall(void)
 //=============================================
 void CorrectionWall(void)
 {
+	LPDIRECT3DDEVICE9 pDevice;
+	//int nCntEdit;
+	//デバイスの取得
+	pDevice = GetDevice();
+
+	//Enemy* pEnemy = GetEnemy();
+	VERTEX_3D* pVtx;
+	g_pVtxBuffWallEdit->Lock(0, 0, (void**)&pVtx, 0);
+
+	if (GetKeyboardTrigger(DIK_UP) == true)
+	{
+		g_Edit.nEditWallNumber++;
+		g_pVtx += 4;
+		if (g_Edit.nEditWallNumber >= g_nSaveWallCnt)
+		{
+			g_Edit.nEditWallNumber = 0;
+			g_pVtx = 0;
+		}
+	}
+	else if (GetKeyboardTrigger(DIK_DOWN) == true)
+	{
+		g_Edit.nEditWallNumber--;
+		g_pVtx -= 4;
+		if (g_Edit.nEditWallNumber < 0)
+		{
+			g_Edit.nEditWallNumber = g_nSaveWallCnt - 1;
+			g_pVtx += 4 * (g_nSaveModelCnt - 1);
+		}
+	}
+
+	//壁の情報変更
+	if (g_Edit.bCursorType == true)
+	{//プレス
+		if (GetKeyboardPress(DIK_W) == true)
+		{
+			g_EditWallInfo[g_Edit.nEditWallNumber].pos.z += MOVE_CURSOR;
+		}
+		if (GetKeyboardPress(DIK_S) == true)
+		{
+			g_EditWallInfo[g_Edit.nEditWallNumber].pos.z -= MOVE_CURSOR;
+		}
+		if (GetKeyboardPress(DIK_A) == true)
+		{
+			g_EditWallInfo[g_Edit.nEditWallNumber].pos.x -= MOVE_CURSOR;
+		}
+		if (GetKeyboardPress(DIK_D) == true)
+		{
+			g_EditWallInfo[g_Edit.nEditWallNumber].pos.x += MOVE_CURSOR;
+		}
+
+		//壁のサイズ変更
+		if (GetKeyboardPress(DIK_G) == true)
+		{
+			g_EditWallInfo[g_Edit.nEditWallNumber].fWide += CHANGE_SIZE;
+			//頂点座標の設定
+			pVtx[g_pVtx].pos = D3DXVECTOR3(-g_EditWallInfo[g_Edit.nEditWallNumber].fWide, g_EditWallInfo[g_Edit.nEditWallNumber].fHeight, 0.0f);
+			pVtx[g_pVtx + 1].pos = D3DXVECTOR3(g_EditWallInfo[g_Edit.nEditWallNumber].fWide, g_EditWallInfo[g_Edit.nEditWallNumber].fHeight, 0.0f);
+			pVtx[g_pVtx + 2].pos = D3DXVECTOR3(-g_EditWallInfo[g_Edit.nEditWallNumber].fWide, 0.0f, 0.0f);
+			pVtx[g_pVtx + 3].pos = D3DXVECTOR3(g_EditWallInfo[g_Edit.nEditWallNumber].fWide, 0.0f, 0.0f);
+		}
+		//壁のサイズ変更
+		if (GetKeyboardPress(DIK_F) == true)
+		{
+			if (g_EditWallInfo[g_Edit.nEditWallNumber].fWide > 0)
+			{
+				g_EditWallInfo[g_Edit.nEditWallNumber].fWide -= CHANGE_SIZE;
+			}
+			//頂点座標の設定
+			pVtx[g_pVtx].pos = D3DXVECTOR3(-g_EditWallInfo[g_Edit.nEditWallNumber].fWide, g_EditWallInfo[g_Edit.nEditWallNumber].fHeight, 0.0f);
+			pVtx[g_pVtx + 1].pos = D3DXVECTOR3(g_EditWallInfo[g_Edit.nEditWallNumber].fWide, g_EditWallInfo[g_Edit.nEditWallNumber].fHeight, 0.0f);
+			pVtx[g_pVtx + 2].pos = D3DXVECTOR3(-g_EditWallInfo[g_Edit.nEditWallNumber].fWide, 0.0f, 0.0f);
+			pVtx[g_pVtx + 3].pos = D3DXVECTOR3(g_EditWallInfo[g_Edit.nEditWallNumber].fWide, 0.0f, 0.0f);
+		}
+		//壁のサイズ変更
+		if (GetKeyboardPress(DIK_B) == true)
+		{
+			g_EditWallInfo[g_Edit.nEditWallNumber].fHeight += CHANGE_SIZE;
+			//頂点座標の設定
+			pVtx[g_pVtx].pos = D3DXVECTOR3(-g_EditWallInfo[g_Edit.nEditWallNumber].fWide, g_EditWallInfo[g_Edit.nEditWallNumber].fHeight, 0.0f);
+			pVtx[g_pVtx + 1].pos = D3DXVECTOR3(g_EditWallInfo[g_Edit.nEditWallNumber].fWide, g_EditWallInfo[g_Edit.nEditWallNumber].fHeight, 0.0f);
+			pVtx[g_pVtx + 2].pos = D3DXVECTOR3(-g_EditWallInfo[g_Edit.nEditWallNumber].fWide, 0.0f, 0.0f);
+			pVtx[g_pVtx + 3].pos = D3DXVECTOR3(g_EditWallInfo[g_Edit.nEditWallNumber].fWide, 0.0f, 0.0f);
+		}
+		//壁のサイズ変更
+		if (GetKeyboardPress(DIK_V) == true)
+		{
+			if (g_EditWallInfo[g_Edit.nEditWallNumber].fHeight > 0)
+			{
+				g_EditWallInfo[g_Edit.nEditWallNumber].fHeight -= CHANGE_SIZE;
+
+			}
+			//頂点座標の設定
+			pVtx[g_pVtx].pos = D3DXVECTOR3(-g_EditWallInfo[g_Edit.nEditWallNumber].fWide, g_EditWallInfo[g_Edit.nEditWallNumber].fHeight, 0.0f);
+			pVtx[g_pVtx + 1].pos = D3DXVECTOR3(g_EditWallInfo[g_Edit.nEditWallNumber].fWide, g_EditWallInfo[g_Edit.nEditWallNumber].fHeight, 0.0f);
+			pVtx[g_pVtx + 2].pos = D3DXVECTOR3(-g_EditWallInfo[g_Edit.nEditWallNumber].fWide, 0.0f, 0.0f);
+			pVtx[g_pVtx + 3].pos = D3DXVECTOR3(g_EditWallInfo[g_Edit.nEditWallNumber].fWide, 0.0f, 0.0f);
+		}
+
+	}
+	else if (g_Edit.bCursorType == false)
+	{//トリガー
+		if (GetKeyboardTrigger(DIK_W) == true)
+		{
+			g_EditWallInfo[g_Edit.nEditWallNumber].pos.z += MOVE_CURSOR;
+		}
+		if (GetKeyboardTrigger(DIK_S) == true)
+		{
+			g_EditWallInfo[g_Edit.nEditWallNumber].pos.z -= MOVE_CURSOR;
+		}
+		if (GetKeyboardTrigger(DIK_A) == true)
+		{
+			g_EditWallInfo[g_Edit.nEditWallNumber].pos.x -= MOVE_CURSOR;
+		}
+		if (GetKeyboardTrigger(DIK_D) == true)
+		{
+			g_EditWallInfo[g_Edit.nEditWallNumber].pos.x += MOVE_CURSOR;
+		}
+
+		//壁のサイズ変更
+		if (GetKeyboardTrigger(DIK_G) == true)
+		{
+			g_EditWallInfo[g_Edit.nEditWallNumber].fWide += CHANGE_SIZE;
+			//頂点座標の設定
+			pVtx[g_pVtx].pos = D3DXVECTOR3(-g_EditWallInfo[g_Edit.nEditWallNumber].fWide, g_EditWallInfo[g_Edit.nEditWallNumber].fHeight, 0.0f);
+			pVtx[g_pVtx + 1].pos = D3DXVECTOR3(g_EditWallInfo[g_Edit.nEditWallNumber].fWide, g_EditWallInfo[g_Edit.nEditWallNumber].fHeight, 0.0f);
+			pVtx[g_pVtx + 2].pos = D3DXVECTOR3(-g_EditWallInfo[g_Edit.nEditWallNumber].fWide, 0.0f, 0.0f);
+			pVtx[g_pVtx + 3].pos = D3DXVECTOR3(g_EditWallInfo[g_Edit.nEditWallNumber].fWide, 0.0f, 0.0f);
+		}
+		//壁のサイズ変更
+		if (GetKeyboardTrigger(DIK_F) == true)
+		{
+			if (g_EditWallInfo[g_Edit.nEditWallNumber].fWide > 0)
+			{
+				g_EditWallInfo[g_Edit.nEditWallNumber].fWide -= CHANGE_SIZE;
+			}
+			//頂点座標の設定
+			pVtx[g_pVtx].pos = D3DXVECTOR3(-g_EditWallInfo[g_Edit.nEditWallNumber].fWide, g_EditWallInfo[g_Edit.nEditWallNumber].fHeight, 0.0f);
+			pVtx[g_pVtx + 1].pos = D3DXVECTOR3(g_EditWallInfo[g_Edit.nEditWallNumber].fWide, g_EditWallInfo[g_Edit.nEditWallNumber].fHeight, 0.0f);
+			pVtx[g_pVtx + 2].pos = D3DXVECTOR3(-g_EditWallInfo[g_Edit.nEditWallNumber].fWide, 0.0f, 0.0f);
+			pVtx[g_pVtx + 3].pos = D3DXVECTOR3(g_EditWallInfo[g_Edit.nEditWallNumber].fWide, 0.0f, 0.0f);
+		}
+		//壁のサイズ変更
+		if (GetKeyboardTrigger(DIK_B) == true)
+		{
+			g_EditWallInfo[g_Edit.nEditWallNumber].fHeight += CHANGE_SIZE;
+			//頂点座標の設定
+			pVtx[g_pVtx].pos = D3DXVECTOR3(-g_EditWallInfo[g_Edit.nEditWallNumber].fWide, g_EditWallInfo[g_Edit.nEditWallNumber].fHeight, 0.0f);
+			pVtx[g_pVtx + 1].pos = D3DXVECTOR3(g_EditWallInfo[g_Edit.nEditWallNumber].fWide, g_EditWallInfo[g_Edit.nEditWallNumber].fHeight, 0.0f);
+			pVtx[g_pVtx + 2].pos = D3DXVECTOR3(-g_EditWallInfo[g_Edit.nEditWallNumber].fWide, 0.0f, 0.0f);
+			pVtx[g_pVtx + 3].pos = D3DXVECTOR3(g_EditWallInfo[g_Edit.nEditWallNumber].fWide, 0.0f, 0.0f);
+		}
+		//壁のサイズ変更
+		if (GetKeyboardTrigger(DIK_V) == true)
+		{
+			if (g_EditWallInfo[g_Edit.nEditWallNumber].fHeight > 0)
+			{
+				g_EditWallInfo[g_Edit.nEditWallNumber].fHeight -= CHANGE_SIZE;
+			}
+			//頂点座標の設定
+			pVtx[g_pVtx].pos = D3DXVECTOR3(-g_EditWallInfo[g_Edit.nEditWallNumber].fWide, g_EditWallInfo[g_Edit.nEditWallNumber].fHeight, 0.0f);
+			pVtx[g_pVtx + 1].pos = D3DXVECTOR3(g_EditWallInfo[g_Edit.nEditWallNumber].fWide, g_EditWallInfo[g_Edit.nEditWallNumber].fHeight, 0.0f);
+			pVtx[g_pVtx + 2].pos = D3DXVECTOR3(-g_EditWallInfo[g_Edit.nEditWallNumber].fWide, 0.0f, 0.0f);
+			pVtx[g_pVtx + 3].pos = D3DXVECTOR3(g_EditWallInfo[g_Edit.nEditWallNumber].fWide, 0.0f, 0.0f);
+		}
+	}
+	//壁のrot回転
+	if (GetKeyboardTrigger(DIK_C) == true)
+	{
+		g_EditWallInfo[g_Edit.nEditWallNumber].rot.y += 1.57f;
+		if (g_EditWallInfo[g_Edit.nEditWallNumber].rot.y > D3DX_PI)
+		{
+			g_EditWallInfo[g_Edit.nEditWallNumber].rot.y = -D3DX_PI;
+		}
+	}
+	else if (GetKeyboardTrigger(DIK_Z) == true)
+	{
+		g_EditWallInfo[g_Edit.nEditWallNumber].rot.y -= 1.57f;
+		if (g_EditWallInfo[g_Edit.nEditWallNumber].rot.y < -D3DX_PI)
+		{
+			g_EditWallInfo[g_Edit.nEditWallNumber].rot.y = D3DX_PI;
+		}
+	}
+
+	//壁のタイプ変更
+	if (GetKeyboardTrigger(DIK_RIGHT) == true)
+	{
+		g_EditWallInfo[g_Edit.nEditWallNumber].nType++;
+		if (g_EditWallInfo[g_Edit.nEditWallNumber].nType >= NUM_WALL)
+		{
+			g_EditWallInfo[g_Edit.nEditWallNumber].nType = 0;
+		}
+	}
+	else if (GetKeyboardTrigger(DIK_LEFT) == true)
+	{
+		g_EditWallInfo[g_Edit.nEditWallNumber].nType--;
+		if (g_EditWallInfo[g_Edit.nEditWallNumber].nType < 0)
+		{
+			g_EditWallInfo[g_Edit.nEditWallNumber].nType = NUM_WALL - 1;
+		}
+	}
+
+	//モデルの設置
+	if (GetKeyboardTrigger(DIK_0) == true)
+	{
+		//g_EditWallInfo[g_Edit.nEditWallNumber + 1].pos = g_EditWallInfo[g_Edit.nEditWallNumber].pos;
+		//g_EditWallInfo[g_Edit.nEditWallNumber + 1].rot = g_EditWallInfo[g_Edit.nEditWallNumber].rot;
+		//g_EditWallInfo[g_Edit.nEditWallNumber + 1].nType = g_EditWallInfo[g_Edit.nEditWallNumber].nType;
+		//g_EditWallInfo[g_Edit.nEditWallNumber + 1].bUse = true;
+		//g_EditWallInfo[g_Edit.nEditWallNumber].bUseGame = true;
+		//g_nSaveWallCnt++;
+		//g_Edit.nEditWallNumber++;
+
+		////頂点カラーの設定
+		//pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		//pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		//pVtx[2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		//pVtx[3].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		g_EditWallInfo[g_Edit.nEditWallNumber].bUseGame = true;
+	}
+
+
+
+	//頂点カラーの設定
+	pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlpha);
+	pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlpha);
+	pVtx[2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlpha);
+	pVtx[3].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlpha);
+
+	//テクスチャ座標の設定
+	pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
+	pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
+	pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
+	pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+
+
+	//モデルの設置
+	if (GetKeyboardTrigger(DIK_F4) == true)
+	{//セーブ処理
+		int nNumEnemy = 0;
+		bool bSave = false;
+		char aSave[256];
+		FILE* pFile = fopen(WALL_FILE_BIN, "wb");
+
+
+		for (int nCnt = 0; nCnt < MAX_WALL; nCnt++)
+		{
+			if (g_EditWallInfo[nCnt].bUseGame == true)
+			{
+				nNumEnemy++;
+			}
+		}
+
+		if (pFile != NULL)
+		{
+			fwrite(&nNumEnemy, sizeof(int), 1, pFile);
+
+			for (int nCnt = 0; nCnt < MAX_WALL; nCnt++)
+			{
+				if (g_EditWallInfo[nCnt].bUseGame == true)
+				{
+					fwrite(&g_EditWallInfo[nCnt], sizeof(EditWallInfo), 1, pFile);
+				}
+			}
+			fclose(pFile);
+
+			//セーブ完了
+			bSave = true;
+
+		}
+	}
 }
 
 //=============================================
@@ -954,6 +1246,8 @@ void DrawEdit(void)
 
 				pDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
 				pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+				SetCursor(D3DXVECTOR3(g_EditWallInfo[g_Edit.nEditWallNumber].pos.x, 40.0f, g_EditWallInfo[g_Edit.nEditWallNumber].pos.z));
+
 			}
 		}
 	}
