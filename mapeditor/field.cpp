@@ -22,10 +22,9 @@
 //=============================================
 LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffField = NULL;
 LPDIRECT3DTEXTURE9 g_pTextureField = NULL; //テクスチャポインタ
-D3DXVECTOR3 g_posField; //位置
-D3DXVECTOR3 g_rotField; //向き
 //D3DXVECTOR3 g_movefield; //移動量
 D3DXMATRIX	g_mtxWorldField;
+Field g_field[MAX_FIELD];
 
 //=============================================
 //ポリゴンの初期化処理
@@ -43,40 +42,49 @@ void InitField(void)
 		&g_pTextureField
 	);
 
-	g_posField = D3DXVECTOR3(0.0f, 0.0f, 0.0f); //プレイヤーの初期位置
-	g_rotField = D3DXVECTOR3(0.0f, 0.0f, 0.0f); //初期の移動速度
-
-	pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * 4, D3DUSAGE_WRITEONLY, FVF_VERTEX_3D, D3DPOOL_MANAGED, &g_pVtxBuffField, NULL);
+	for (int nCnt = 0; nCnt < MAX_FIELD; nCnt++)
+	{
+		g_field[nCnt].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f); //床の初期位置
+		g_field[nCnt].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f); //床の初期方向
+		g_field[nCnt].fWide = FIELD_WIDE; //床の横幅
+		g_field[nCnt].fDepth = FIELD_DEPTH; //床の縦幅
+		g_field[nCnt].bUse = false;
+	}
+	pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * 4 * MAX_FIELD, D3DUSAGE_WRITEONLY, FVF_VERTEX_3D, D3DPOOL_MANAGED, &g_pVtxBuffField, NULL);
 
 	VERTEX_3D* pVtx;
 
 	//頂点バッファをロックし頂点情報へのポインタを取得
 	g_pVtxBuffField->Lock(0, 0, (void**)&pVtx, 0);
 
-	//頂点座標の設定
-	pVtx[0].pos = D3DXVECTOR3(-FIELD_WIDE, 0.0f, FIELD_DEPTH);
-	pVtx[1].pos = D3DXVECTOR3(FIELD_WIDE, 0.0f, FIELD_DEPTH);
-	pVtx[2].pos = D3DXVECTOR3(-FIELD_WIDE, 0.0f, -FIELD_DEPTH);
-	pVtx[3].pos = D3DXVECTOR3(FIELD_WIDE, 0.0f, -FIELD_DEPTH);
+	for (int nCnt = 0; nCnt < MAX_FIELD; nCnt++)
+	{
+		//頂点座標の設定
+		pVtx[0].pos = D3DXVECTOR3(-FIELD_WIDE, 0.0f, FIELD_DEPTH);
+		pVtx[1].pos = D3DXVECTOR3(FIELD_WIDE, 0.0f, FIELD_DEPTH);
+		pVtx[2].pos = D3DXVECTOR3(-FIELD_WIDE, 0.0f, -FIELD_DEPTH);
+		pVtx[3].pos = D3DXVECTOR3(FIELD_WIDE, 0.0f, -FIELD_DEPTH);
 
-	//法線ベクトルの設定
-	pVtx[0].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-	pVtx[1].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-	pVtx[2].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-	pVtx[3].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+		//法線ベクトルの設定
+		pVtx[0].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+		pVtx[1].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+		pVtx[2].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+		pVtx[3].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 
-	//頂点カラーの設定
-	pVtx[0].col = D3DCOLOR_RGBA(255, 255, 255, 255);
-	pVtx[1].col = D3DCOLOR_RGBA(255, 255, 255, 255);
-	pVtx[2].col = D3DCOLOR_RGBA(255, 255, 255, 255);
-	pVtx[3].col = D3DCOLOR_RGBA(255, 255, 255, 255);
+		//頂点カラーの設定
+		pVtx[0].col = D3DCOLOR_RGBA(255, 255, 255, 255);
+		pVtx[1].col = D3DCOLOR_RGBA(255, 255, 255, 255);
+		pVtx[2].col = D3DCOLOR_RGBA(255, 255, 255, 255);
+		pVtx[3].col = D3DCOLOR_RGBA(255, 255, 255, 255);
 
-	//テクスチャの座標指定
-	pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-	pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
-	pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-	pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+		//テクスチャの座標指定
+		pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
+		pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
+		pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
+		pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
 
+		pVtx += 4;
+	}
 	g_pVtxBuffField->Unlock();
 }
 
@@ -136,36 +144,42 @@ void DrawField(void)
 
 	D3DXMATRIX mtxRot, mtxTrans; //計算用マトリックス
 
-	//マトリックスの初期化
-	D3DXMatrixIdentity(&g_mtxWorldField);
+	for (int nCnt = 0; nCnt < MAX_FIELD; nCnt++)
+	{
+		if (g_field[nCnt].bUse == true)
+		{
+			//マトリックスの初期化
+			D3DXMatrixIdentity(&g_mtxWorldField);
 
-	//向きを反映
-	D3DXMatrixRotationYawPitchRoll(&mtxRot, g_rotField.y, g_rotField.x, g_rotField.z);
+			//向きを反映
+			D3DXMatrixRotationYawPitchRoll(&mtxRot, g_field[nCnt].rot.y, g_field[nCnt].rot.x, g_field[nCnt].rot.z);
 
-	D3DXMatrixMultiply(&g_mtxWorldField, &g_mtxWorldField, &mtxRot);
+			D3DXMatrixMultiply(&g_mtxWorldField, &g_mtxWorldField, &mtxRot);
 
-	//位置を反映
-	D3DXMatrixTranslation(&mtxTrans, g_posField.x, g_posField.y, g_posField.z);
+			//位置を反映
+			D3DXMatrixTranslation(&mtxTrans, g_field[nCnt].pos.x, g_field[nCnt].pos.y, g_field[nCnt].pos.z);
 
-	D3DXMatrixMultiply(&g_mtxWorldField, &g_mtxWorldField, &mtxTrans);
+			D3DXMatrixMultiply(&g_mtxWorldField, &g_mtxWorldField, &mtxTrans);
 
-	//ワールドマトリックスの設定
-	pDevice->SetTransform(D3DTS_WORLD, &g_mtxWorldField);
+			//ワールドマトリックスの設定
+			pDevice->SetTransform(D3DTS_WORLD, &g_mtxWorldField);
 
-	//頂点バッファをデータストリームに設定
-	pDevice->SetStreamSource(0, g_pVtxBuffField, 0, sizeof(VERTEX_3D));
+			//頂点バッファをデータストリームに設定
+			pDevice->SetStreamSource(0, g_pVtxBuffField, 4 * nCnt, sizeof(VERTEX_3D));
 
-	//頂点フォーマットの設定
-	pDevice->SetFVF(FVF_VERTEX_3D);
+			//頂点フォーマットの設定
+			pDevice->SetFVF(FVF_VERTEX_3D);
 
-	//テクスチャの設定
-	pDevice->SetTexture(0, g_pTextureField);
+			//テクスチャの設定
+			pDevice->SetTexture(0, g_pTextureField);
 
-	//ポリゴンの描画
-	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+			//ポリゴンの描画
+			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+		}
+	}
 }
 
 D3DXVECTOR3 GetFieldPos(void)
 {
-	return g_posField;
+	return g_field->pos;
 }

@@ -9,6 +9,7 @@
 #include "input.h"
 #include "camera.h"
 #include "wall.h"
+#include "field.h"
 #include "cursor.h"
 #include <string.h>
 #include <stdio.h>
@@ -38,9 +39,14 @@ LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffWallEdit = NULL; //壁の頂点情報
 D3DXMATRIX	g_mtxWorldWallEdit; //壁のワールドマトリックス
 EditWallInfo g_EditWallInfo[MAX_WALL]; //壁のエディット情報
 
+LPDIRECT3DVERTEXBUFFER9 g_pVtxBuffFieldEdit = NULL; //床の頂点情報
+D3DXMATRIX	g_mtxWorldFieldEdit; //床のワールドマトリックス
+EditFieldInfo g_EditFieldInfo[MAX_WALL]; //床のエディット情報
+
 bool g_bSave = true; //セーブできるか
-int g_nSaveModelCnt;
-int g_nSaveWallCnt;
+int g_nSaveModelCnt; //モデルのセーブ数カウント
+int g_nSaveWallCnt; //壁のセーブ数カウント
+int g_nSaveFieldCnt; //床のセーブ数カウント
 int g_nSave;
 int g_pVtx; //頂点
 float g_fAlpha; //α値
@@ -62,6 +68,14 @@ static const char* WALL_TEX_NAME[NUM_WALL] =
 {
 	"data\\TEXTURE\\snow.jpg",
 };
+
+//=============================================
+//床のテクスチャの種類
+//=============================================
+static const char* FIELD_TEX_NAME[NUM_FIELD] =
+{
+	"data\\TEXTURE\\ground.jpeg",
+};	
 
 //=============================================
 //エディットの初期化処理
@@ -867,8 +881,6 @@ void SaveWall(void)
 		g_pVtx += 4;
 	}
 
-
-
 	//頂点カラーの設定
 	pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlpha);
 	pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlpha);
@@ -880,7 +892,6 @@ void SaveWall(void)
 	pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
 	pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
 	pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
-
 
 	//モデルの設置
 	if (GetKeyboardTrigger(DIK_F4) == true)
@@ -1144,8 +1155,6 @@ void CorrectionWall(void)
 		g_EditWallInfo[g_Edit.nEditWallNumber].bUseGame = true;
 	}
 
-
-
 	//頂点カラーの設定
 	pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlpha);
 	pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlpha);
@@ -1239,6 +1248,27 @@ void reSaveWall(void)
 	}
 	g_pVtxBuffWallEdit->Unlock();
 	g_EditWallInfo[g_Edit.nEditWallNumber].bUse = true; //保存されてる最後のモデルの次のやつをtrueに
+}
+
+//=============================================
+//床のセーブ処理
+//=============================================
+void SaveField(void)
+{
+}
+
+//=============================================
+//床の編集処理
+//=============================================
+void CorrectionField(void)
+{
+}
+
+//=============================================
+//床の途中からセーブ処理
+//=============================================
+void reSaveField(void)
+{
 }
 
 //=============================================

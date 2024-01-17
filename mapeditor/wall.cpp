@@ -20,7 +20,6 @@ LPDIRECT3DTEXTURE9 g_pTextureWall = NULL; //テクスチャポインタ
 D3DXMATRIX	g_mtxWorldWall;
 Wall g_aWall[MAX_WALL];
 
-
 //=============================================
 //ポリゴンの初期化処理
 //=============================================

@@ -49,7 +49,7 @@ typedef struct
 }EditModelInfo;
 
 //=============================================
-//壁エディットの構想体の定義
+//床エディットの構想体の定義
 //=============================================
 typedef struct
 {
@@ -61,6 +61,20 @@ typedef struct
 	bool bUse;
 	bool bUseGame;
 }EditWallInfo;
+
+//=============================================
+//床エディットの構想体の定義
+//=============================================
+typedef struct
+{
+	D3DXVECTOR3 pos;
+	D3DXVECTOR3 rot;
+	int nType;
+	float fWide;
+	float fDepth;
+	bool bUse;
+	bool bUseGame;
+}EditFieldInfo;
 
 //=============================================
 //プロトタイプ宣言
@@ -75,6 +89,9 @@ void reSaveModel(void);
 void SaveWall(void);
 void CorrectionWall(void);
 void reSaveWall(void);
+void SaveField(void);
+void CorrectionField(void);
+void reSaveField(void);
 void DrawEdit(void);
 void DebagEdit(void);
 void DebagInfo(void);
