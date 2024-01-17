@@ -335,10 +335,74 @@ void UpdateEdit(void)
 }
 
 //=============================================
-//再読み込み処理（管理）
+//再設置用関数（管理用）
 //=============================================
 void reSaveEdit(void)
 {
+	if (GetKeyboardTrigger(DIK_1) == true)
+	{//モデルを設置
+		g_Edit.EditType = EDITTYPE_MODEL;
+		g_Edit.nEditModelNumber = g_nSaveModelCnt;
+
+		if (g_EditModelInfo[g_Edit.nEditModelNumber].bUseGame == false)
+		{
+			g_EditModelInfo[g_Edit.nEditModelNumber].bUse = true; //次に設置するものは表示しない
+		}
+	}
+
+
+	else if (GetKeyboardTrigger(DIK_2) == true)
+	{//今まで置いたモデルの編集
+		g_Edit.EditType = EDITTYPE_CORRECTIONMODEL;
+		if (g_EditModelInfo[g_Edit.nEditModelNumber].bUseGame == false)
+		{
+			g_EditModelInfo[g_Edit.nEditModelNumber].bUse = false; //次に設置するものは表示しない
+			g_Edit.nEditModelNumber--;
+		}
+	}
+
+	else if (GetKeyboardTrigger(DIK_3) == true)
+	{//壁を設置
+		g_Edit.EditType = EDITTYPE_WALL;
+		g_Edit.nEditWallNumber = g_nSaveWallCnt;
+
+		if (g_EditWallInfo[g_Edit.nEditWallNumber].bUseGame == false)
+		{
+			g_EditWallInfo[g_Edit.nEditWallNumber].bUse = true; //次に設置するものは表示しない
+		}
+	}
+
+	else if (GetKeyboardTrigger(DIK_4) == true)
+	{//今まで置いた壁の編集
+		g_Edit.EditType = EDITTYPE_CORRECTIONWALL;
+
+		if (g_EditWallInfo[g_Edit.nEditWallNumber].bUseGame == false)
+		{
+			g_EditWallInfo[g_Edit.nEditWallNumber].bUse = true; //次に設置するものは表示しない
+			g_Edit.nEditWallNumber--;
+		}
+	}
+
+	if (g_Edit.EditType == EDITTYPE_MODEL)
+	{//モデル
+		SaveModel();
+	}
+	else if (g_Edit.EditType == EDITTYPE_CORRECTIONMODEL)
+	{//モデル置きなおし
+		CorrectionModel();
+	}
+	else if (g_Edit.EditType == EDITTYPE_WALL)
+	{//壁
+		SaveWall();
+	}
+	else if (g_Edit.EditType == EDITTYPE_CORRECTIONWALL)
+	{//壁置きなおし
+		CorrectionWall();
+	}
+	if (GetKeyboardTrigger(DIK_F5) == true)
+	{
+		g_Edit.bCursorType = g_Edit.bCursorType ? false : true;
+	}
 }
 
 //=============================================
@@ -1094,6 +1158,7 @@ void CorrectionWall(void)
 	pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
 	pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
 
+	g_pVtxBuffWallEdit->Unlock();
 
 	//モデルの設置
 	if (GetKeyboardTrigger(DIK_F4) == true)
@@ -1130,6 +1195,7 @@ void CorrectionWall(void)
 
 		}
 	}
+
 }
 
 //=============================================
@@ -1137,6 +1203,42 @@ void CorrectionWall(void)
 //=============================================
 void reSaveWall(void)
 {
+	//ファイルの読み込み
+	FILE* pFile = fopen(WALL_FILE_BIN, "rb");
+
+	if (pFile != NULL)
+	{
+		//敵の使用してる数の読み込み
+		fread(&g_nSaveWallCnt, sizeof(int), 1, pFile);
+
+		//敵の使用数分、敵の読み込み
+		fread(&g_EditWallInfo[0], sizeof(EditWallInfo), g_nSaveWallCnt, pFile);
+
+		//ファイルを閉じる
+		fclose(pFile);
+	}
+
+	else
+	{
+		return;
+	}
+
+	VERTEX_3D* pVtx;
+	g_pVtxBuffWallEdit->Lock(0, 0, (void**)&pVtx, 0);
+	for (int nCntUseWall = 0; nCntUseWall < MAX_WALL; nCntUseWall++)
+	{
+		if (g_EditWallInfo[nCntUseWall].bUse == true)
+		{
+			g_Edit.nEditWallNumber++;
+
+			pVtx[g_pVtx].pos = D3DXVECTOR3(-g_EditWallInfo[g_Edit.nEditWallNumber].fWide, g_EditWallInfo[g_Edit.nEditWallNumber].fHeight, 0.0f);
+			pVtx[g_pVtx + 1].pos = D3DXVECTOR3(g_EditWallInfo[g_Edit.nEditWallNumber].fWide, g_EditWallInfo[g_Edit.nEditWallNumber].fHeight, 0.0f);
+			pVtx[g_pVtx + 2].pos = D3DXVECTOR3(-g_EditWallInfo[g_Edit.nEditWallNumber].fWide, 0.0f, 0.0f);
+			pVtx[g_pVtx + 3].pos = D3DXVECTOR3(g_EditWallInfo[g_Edit.nEditWallNumber].fWide, 0.0f, 0.0f);
+		}
+	}
+	g_pVtxBuffWallEdit->Unlock();
+	g_EditWallInfo[g_Edit.nEditWallNumber].bUse = true; //保存されてる最後のモデルの次のやつをtrueに
 }
 
 //=============================================

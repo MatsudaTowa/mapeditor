@@ -343,10 +343,14 @@ void Update(void)
 		if (g_bReSave == true)
 		{
 			reSaveModel();
+			reSaveWall();
 		}
 	}
-
-	if (g_bEdit == true || g_bReSave == true)
+	if (g_bReSave == true)
+	{
+		reSaveEdit();
+	}
+	if (g_bEdit == true)
 	{
 		UpdateEdit();
 	}
@@ -400,7 +404,7 @@ void Draw(void)
 		{
 			DrawEdit();
 		}
-		if (g_bEdit == false && g_bReSave ==false)
+		if (g_bEdit == false)
 		{
 			DrawModel();
 		}
