@@ -414,23 +414,69 @@ void Draw(void)
 		{
 			DrawEdit();
 		}
-		if (g_bEdit == false 
-			|| (pEdit->EditType != EDITTYPE_MODEL && pEdit->EditType != EDITTYPE_CORRECTIONMODEL) 
-			|| (g_bReSave == true && pEdit->EditType == EDITTYPE_CORRECTIONMODEL))
+		else if (g_bEdit != true)
 		{
 			DrawModel();
+			DrawField();
+			DrawWall();
 		}
-		if (g_bEdit == false 
-			|| (pEdit->EditType != EDITTYPE_FIELD && pEdit->EditType != EDITTYPE_CORRECTIONFIELD) 
-			|| (g_bReSave == true && pEdit->EditType == EDITTYPE_CORRECTIONFIELD))
+
+		//Ý’u‚·‚é‚Æ‚«‚Ì•`‰æ(ƒ‚ƒfƒ‹)
+		if (g_bEdit == true && (pEdit->EditType == EDITTYPE_MODEL || pEdit->EditType == EDITTYPE_CORRECTIONMODEL))
 		{
 			DrawField();
-		}
-		if (g_bEdit == false 
-			|| (pEdit->EditType != EDITTYPE_WALL && pEdit->EditType != EDITTYPE_CORRECTIONWALL)
-			|| (g_bReSave == true && pEdit->EditType == EDITTYPE_CORRECTIONWALL))
-		{
 			DrawWall();
+		}
+		//Ý’u‚·‚é‚Æ‚«‚Ì•`‰æ(°)
+		if (g_bEdit == true && (pEdit->EditType == EDITTYPE_FIELD || pEdit->EditType == EDITTYPE_CORRECTIONFIELD))
+		{
+			DrawModel();
+			DrawWall();
+		}
+		//Ý’u‚·‚é‚Æ‚«‚Ì•`‰æ(°)
+		if (g_bEdit == true && (pEdit->EditType == EDITTYPE_WALL || pEdit->EditType == EDITTYPE_CORRECTIONWALL))
+		{
+			DrawModel();
+			DrawField();
+		}
+
+		//ÄÝ’u‚·‚é‚Æ‚«‚Ì•`‰æ(ƒ‚ƒfƒ‹)
+		if(g_bReSave == true && pEdit->EditType == EDITTYPE_MODEL)
+		{
+			DrawModel();
+			DrawField();
+			DrawWall();
+		}
+		else if (g_bReSave == true && pEdit->EditType == EDITTYPE_CORRECTIONMODEL)
+		{
+			DrawField();
+			DrawWall();
+		}
+
+		//ÄÝ’u‚·‚é‚Æ‚«‚Ì•`‰æ(°)
+		if (g_bReSave == true && pEdit->EditType == EDITTYPE_FIELD)
+		{
+			DrawModel();
+			DrawField();
+			DrawWall();
+		}
+		else if (g_bReSave == true && pEdit->EditType == EDITTYPE_CORRECTIONFIELD)
+		{
+			DrawModel();
+			DrawWall();
+		}
+
+		//ÄÝ’u‚·‚é‚Æ‚«‚Ì•`‰æ(•Ç)
+		if (g_bReSave == true && pEdit->EditType == EDITTYPE_WALL)
+		{
+			DrawModel();
+			DrawField();
+			DrawWall();
+		}
+		else if (g_bReSave == true && pEdit->EditType == EDITTYPE_CORRECTIONWALL)
+		{
+			DrawModel();
+			DrawField();
 		}
 		DrawShadow();
 

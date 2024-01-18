@@ -1361,6 +1361,8 @@ void reSaveWall(void)
 			pVtx[g_pVtx + 1].pos = D3DXVECTOR3(g_EditWallInfo[g_Edit.nEditWallNumber].fWide, g_EditWallInfo[g_Edit.nEditWallNumber].fHeight, 0.0f);
 			pVtx[g_pVtx + 2].pos = D3DXVECTOR3(-g_EditWallInfo[g_Edit.nEditWallNumber].fWide, 0.0f, 0.0f);
 			pVtx[g_pVtx + 3].pos = D3DXVECTOR3(g_EditWallInfo[g_Edit.nEditWallNumber].fWide, 0.0f, 0.0f);
+
+			g_pVtx += 4;
 		}
 	}
 	g_pVtxBuffWallEdit->Unlock();
@@ -1714,7 +1716,6 @@ void CorrectionField(void)
 			if (g_EditFieldInfo[g_Edit.nEditFieldNumber].fDepth > 0)
 			{
 				g_EditFieldInfo[g_Edit.nEditFieldNumber].fDepth -= CHANGE_SIZE;
-
 			}
 			//頂点座標の設定
 			pVtx[g_pVtxField].pos = D3DXVECTOR3(-g_EditFieldInfo[g_Edit.nEditFieldNumber].fWide, 0.0f, g_EditFieldInfo[g_Edit.nEditFieldNumber].fDepth);
@@ -1910,15 +1911,17 @@ void reSaveField(void)
 	g_pVtxBuffFieldEdit->Lock(0, 0, (void**)&pVtx, 0);
 	for (int nCntUseField = 0; nCntUseField < MAX_FIELD; nCntUseField++)
 	{
-		if (g_EditWallInfo[nCntUseField].bUse == true)
+		if (g_EditFieldInfo[nCntUseField].bUseGame == true)
 		{
 			g_Edit.nEditFieldNumber++;
 
 			//頂点座標の設定
 			pVtx[g_pVtxField].pos = D3DXVECTOR3(-g_EditFieldInfo[g_Edit.nEditFieldNumber].fWide, 0.0f, g_EditFieldInfo[g_Edit.nEditFieldNumber].fDepth);
-			pVtx[g_pVtxField + 1].pos = D3DXVECTOR3(g_EditFieldInfo[g_Edit.nEditFieldNumber].fWide, 0.0f, g_EditFieldInfo[g_Edit.nEditFieldNumber].fDepth);
-			pVtx[g_pVtxField + 2].pos = D3DXVECTOR3(-g_EditFieldInfo[g_Edit.nEditFieldNumber].fWide, 0.0f, -g_EditFieldInfo[g_Edit.nEditFieldNumber].fDepth);
-			pVtx[g_pVtxField + 3].pos = D3DXVECTOR3(g_EditFieldInfo[g_Edit.nEditFieldNumber].fWide, 0.0f, -g_EditFieldInfo[g_Edit.nEditFieldNumber].fDepth);
+			pVtx[g_pVtxField+1].pos = D3DXVECTOR3(g_EditFieldInfo[g_Edit.nEditFieldNumber].fWide, 0.0f, g_EditFieldInfo[g_Edit.nEditFieldNumber].fDepth);
+			pVtx[g_pVtxField+2].pos = D3DXVECTOR3(-g_EditFieldInfo[g_Edit.nEditFieldNumber].fWide, 0.0f, -g_EditFieldInfo[g_Edit.nEditFieldNumber].fDepth);
+			pVtx[g_pVtxField+3].pos = D3DXVECTOR3(g_EditFieldInfo[g_Edit.nEditFieldNumber].fWide, 0.0f, -g_EditFieldInfo[g_Edit.nEditFieldNumber].fDepth);
+
+			g_pVtxField += 4;
 		}
 	}
 	g_pVtxBuffFieldEdit->Unlock();
