@@ -351,6 +351,7 @@ void Update(void)
 		{
 			reSaveModel();
 			reSaveWall();
+			reSaveField();
 		}
 	}
 	if (g_bReSave == true)
@@ -402,6 +403,8 @@ void Draw(void)
 		(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER),
 		D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
 
+	Edit* pEdit = GetEdit();
+
 	//•`‰æŠJŽn
 	if (SUCCEEDED(g_pD3DDevice->BeginScene()))
 	{
@@ -411,15 +414,24 @@ void Draw(void)
 		{
 			DrawEdit();
 		}
-		if (g_bEdit == false)
+		if (g_bEdit == false 
+			|| (pEdit->EditType != EDITTYPE_MODEL && pEdit->EditType != EDITTYPE_CORRECTIONMODEL) 
+			|| (g_bReSave == true && pEdit->EditType == EDITTYPE_CORRECTIONMODEL))
 		{
 			DrawModel();
 		}
-
-		DrawField();
-
-		DrawWall();
-
+		if (g_bEdit == false 
+			|| (pEdit->EditType != EDITTYPE_FIELD && pEdit->EditType != EDITTYPE_CORRECTIONFIELD) 
+			|| (g_bReSave == true && pEdit->EditType == EDITTYPE_CORRECTIONFIELD))
+		{
+			DrawField();
+		}
+		if (g_bEdit == false 
+			|| (pEdit->EditType != EDITTYPE_WALL && pEdit->EditType != EDITTYPE_CORRECTIONWALL)
+			|| (g_bReSave == true && pEdit->EditType == EDITTYPE_CORRECTIONWALL))
+		{
+			DrawWall();
+		}
 		DrawShadow();
 
 		DebagCameraPos();

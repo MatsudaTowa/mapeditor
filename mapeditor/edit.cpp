@@ -1828,7 +1828,7 @@ void CorrectionField(void)
 	//モデルの設置
 	if (GetKeyboardTrigger(DIK_0) == true)
 	{
-		g_EditWallInfo[g_Edit.nEditWallNumber].bUseGame = true;
+		g_EditFieldInfo[g_Edit.nEditFieldNumber].bUseGame = true;
 		g_pVtxField += 4;
 	}
 
@@ -1886,6 +1886,43 @@ void CorrectionField(void)
 //=============================================
 void reSaveField(void)
 {
+	//ファイルの読み込み
+	FILE* pFile = fopen(FIELD_FILE_BIN, "rb");
+
+	if (pFile != NULL)
+	{
+		//床の使用してる数の読み込み
+		fread(&g_nSaveFieldCnt, sizeof(int), 1, pFile);
+
+		//床の使用数分、敵の読み込み
+		fread(&g_EditFieldInfo[0], sizeof(EditFieldInfo), g_nSaveFieldCnt, pFile);
+
+		//ファイルを閉じる
+		fclose(pFile);
+	}
+
+	else
+	{
+		return;
+	}
+
+	VERTEX_3D* pVtx;
+	g_pVtxBuffFieldEdit->Lock(0, 0, (void**)&pVtx, 0);
+	for (int nCntUseField = 0; nCntUseField < MAX_FIELD; nCntUseField++)
+	{
+		if (g_EditWallInfo[nCntUseField].bUse == true)
+		{
+			g_Edit.nEditFieldNumber++;
+
+			//頂点座標の設定
+			pVtx[g_pVtxField].pos = D3DXVECTOR3(-g_EditFieldInfo[g_Edit.nEditFieldNumber].fWide, 0.0f, g_EditFieldInfo[g_Edit.nEditFieldNumber].fDepth);
+			pVtx[g_pVtxField + 1].pos = D3DXVECTOR3(g_EditFieldInfo[g_Edit.nEditFieldNumber].fWide, 0.0f, g_EditFieldInfo[g_Edit.nEditFieldNumber].fDepth);
+			pVtx[g_pVtxField + 2].pos = D3DXVECTOR3(-g_EditFieldInfo[g_Edit.nEditFieldNumber].fWide, 0.0f, -g_EditFieldInfo[g_Edit.nEditFieldNumber].fDepth);
+			pVtx[g_pVtxField + 3].pos = D3DXVECTOR3(g_EditFieldInfo[g_Edit.nEditFieldNumber].fWide, 0.0f, -g_EditFieldInfo[g_Edit.nEditFieldNumber].fDepth);
+		}
+	}
+	g_pVtxBuffFieldEdit->Unlock();
+	g_EditFieldInfo[g_Edit.nEditFieldNumber].bUse = true; //保存されてる最後の床の次のやつをtrueに
 }
 
 //=============================================
