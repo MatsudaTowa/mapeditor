@@ -157,7 +157,7 @@ void DrawField(void)
 			pDevice->SetTransform(D3DTS_WORLD, &g_mtxWorldField);
 
 			//頂点バッファをデータストリームに設定
-			pDevice->SetStreamSource(0, g_pVtxBuffField, 4 * nCnt, sizeof(VERTEX_3D));
+			pDevice->SetStreamSource(0, g_pVtxBuffField, 0, sizeof(VERTEX_3D));
 
 			//頂点フォーマットの設定
 			pDevice->SetFVF(FVF_VERTEX_3D);
@@ -166,7 +166,7 @@ void DrawField(void)
 			pDevice->SetTexture(0, g_pTextureField);
 
 			//ポリゴンの描画
-			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4 * nCnt, 2);
 		}
 	}
 }
