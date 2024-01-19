@@ -491,7 +491,7 @@ void reSaveEdit(void)
 
 		if (g_EditWallInfo[g_Edit.nEditWallNumber].bUseGame == false)
 		{
-			g_EditWallInfo[g_Edit.nEditWallNumber].bUse = true; //次に設置するものは表示しない
+			g_EditWallInfo[g_Edit.nEditWallNumber].bUse = false; //次に設置するものは表示しない
 			g_Edit.nEditWallNumber = 0; //最初に置いたものにカーソルを移動
 			g_pVtx = 0; //最初に置いたものの頂点
 		}
@@ -512,7 +512,7 @@ void reSaveEdit(void)
 
 		if (g_EditFieldInfo[g_Edit.nEditFieldNumber].bUseGame == false)
 		{
-			g_EditFieldInfo[g_Edit.nEditFieldNumber].bUse = true; //次に設置するものは表示しない
+			g_EditFieldInfo[g_Edit.nEditFieldNumber].bUse = false; //次に設置するものは表示しない
 			g_Edit.nEditFieldNumber = 0; //最初に置いたものにカーソルを移動
 			g_pVtxField = 0; //最初に置いたものの頂点
 		}
@@ -1091,7 +1091,7 @@ void CorrectionWall(void)
 		if (g_Edit.nEditWallNumber < 0)
 		{
 			g_Edit.nEditWallNumber = g_nSaveWallCnt - 1;
-			g_pVtx += 4 * (g_nSaveModelCnt - 1);
+			g_pVtx += 4 * (g_nSaveWallCnt - 1);
 		}
 	}
 
@@ -1355,14 +1355,19 @@ void reSaveWall(void)
 	{
 		if (g_EditWallInfo[nCntUseWall].bUse == true)
 		{
-			g_Edit.nEditWallNumber++;
 
 			pVtx[g_pVtx].pos = D3DXVECTOR3(-g_EditWallInfo[g_Edit.nEditWallNumber].fWide, g_EditWallInfo[g_Edit.nEditWallNumber].fHeight, 0.0f);
 			pVtx[g_pVtx + 1].pos = D3DXVECTOR3(g_EditWallInfo[g_Edit.nEditWallNumber].fWide, g_EditWallInfo[g_Edit.nEditWallNumber].fHeight, 0.0f);
 			pVtx[g_pVtx + 2].pos = D3DXVECTOR3(-g_EditWallInfo[g_Edit.nEditWallNumber].fWide, 0.0f, 0.0f);
 			pVtx[g_pVtx + 3].pos = D3DXVECTOR3(g_EditWallInfo[g_Edit.nEditWallNumber].fWide, 0.0f, 0.0f);
 
+			g_Edit.nEditWallNumber++;
+
 			g_pVtx += 4;
+			if (g_pVtx > 4 * (g_nSaveWallCnt - 1))
+			{
+				g_pVtx = 0;
+			}
 		}
 	}
 	g_pVtxBuffWallEdit->Unlock();
@@ -1913,15 +1918,19 @@ void reSaveField(void)
 	{
 		if (g_EditFieldInfo[nCntUseField].bUseGame == true)
 		{
-			g_Edit.nEditFieldNumber++;
-
 			//頂点座標の設定
 			pVtx[g_pVtxField].pos = D3DXVECTOR3(-g_EditFieldInfo[g_Edit.nEditFieldNumber].fWide, 0.0f, g_EditFieldInfo[g_Edit.nEditFieldNumber].fDepth);
 			pVtx[g_pVtxField+1].pos = D3DXVECTOR3(g_EditFieldInfo[g_Edit.nEditFieldNumber].fWide, 0.0f, g_EditFieldInfo[g_Edit.nEditFieldNumber].fDepth);
 			pVtx[g_pVtxField+2].pos = D3DXVECTOR3(-g_EditFieldInfo[g_Edit.nEditFieldNumber].fWide, 0.0f, -g_EditFieldInfo[g_Edit.nEditFieldNumber].fDepth);
 			pVtx[g_pVtxField+3].pos = D3DXVECTOR3(g_EditFieldInfo[g_Edit.nEditFieldNumber].fWide, 0.0f, -g_EditFieldInfo[g_Edit.nEditFieldNumber].fDepth);
 
+			g_Edit.nEditFieldNumber++;
+
 			g_pVtxField += 4;
+			if (g_pVtxField > 4 * (g_nSaveFieldCnt - 1))
+			{
+				g_pVtxField = 0;
+			}
 		}
 	}
 	g_pVtxBuffFieldEdit->Unlock();
