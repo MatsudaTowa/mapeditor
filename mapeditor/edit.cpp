@@ -2058,7 +2058,7 @@ void DrawEdit(void)
 		//保存してたマテリアルを戻す
 		pDevice->SetMaterial(&matDef);
 
-		SetCursor(D3DXVECTOR3(g_EditModelInfo[g_Edit.nEditModelNumber].pos.x, 40.0f, g_EditModelInfo[g_Edit.nEditModelNumber].pos.z));
+		SetCursor(D3DXVECTOR3(g_EditModelInfo[g_Edit.nEditModelNumber].pos.x, g_EditModelInfo[g_Edit.nEditModelNumber].pos.y + 40.0f, g_EditModelInfo[g_Edit.nEditModelNumber].pos.z));
 	}
 	else if (g_Edit.EditType == EDITTYPE_WALL || g_Edit.EditType == EDITTYPE_CORRECTIONWALL)
 	{//壁設置の時

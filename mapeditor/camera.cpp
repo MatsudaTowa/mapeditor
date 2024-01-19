@@ -252,7 +252,6 @@ void UpdateCamera(void)
 //=============================================
 void EditCamera(void)
 {
-	//g_Camera.posV = D3DXVECTOR3(0.0f, EDIT_LENGTH_Y, EDIT_LENGTH_Z); //Ž‹“_
 
 	Cursol* pCursol = GetCursol();
 	Edit* pEdit = GetEdit();
@@ -329,9 +328,18 @@ void EditCamera(void)
 		g_Camera.rot.y += 0.02f;
 	}
 
-	g_Camera.posV.x = g_Camera.posR.x - sinf(g_Camera.rot.y) * EDIT_LENGTH_Z;
-	g_Camera.posV.y = EDIT_LENGTH_Y;
-	g_Camera.posV.z = g_Camera.posR.z - cosf(g_Camera.rot.y) * EDIT_LENGTH_Z;
+	if (g_Camera.bCameraAngle == false)
+	{
+		g_Camera.posV.x = g_Camera.posR.x - sinf(g_Camera.rot.y) * DEFAULT_LENGTH_Z;
+		g_Camera.posV.y = DEFAULT_LENGTH_Y;
+		g_Camera.posV.z = g_Camera.posR.z - cosf(g_Camera.rot.y) * DEFAULT_LENGTH_Z;
+	}
+	else if (g_Camera.bCameraAngle == true)
+	{
+		g_Camera.posV.x = g_Camera.posR.x - sinf(g_Camera.rot.y) * EDIT_LENGTH_Z;
+		g_Camera.posV.y = EDIT_LENGTH_Y;
+		g_Camera.posV.z = g_Camera.posR.z - cosf(g_Camera.rot.y) * EDIT_LENGTH_Z;
+	}
 
 }
 
