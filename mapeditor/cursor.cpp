@@ -165,3 +165,11 @@ void SetCursor(D3DXVECTOR3 pos)
 	g_Cursol.pos = pos;
 	g_Cursol.bUse = true; //使用する
 }
+
+//=============================================
+//カーソルの情報取得処理
+//=============================================
+Cursol* GetCursol(void)
+{
+	return &g_Cursol;
+}

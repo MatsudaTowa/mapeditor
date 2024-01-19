@@ -6,9 +6,10 @@
 //=============================================
 #include "main.h"
 
-#define PLAYER_LENGTH_X	(30.0f) //プレイヤーとカメラXの距離
-#define PLAYER_LENGTH_Y	(100.0f) //プレイヤーとカメラYの距離
-#define PLAYER_LENGTH_Z	(200.0f) //プレイヤーとカメラZの距離
+#define DEFAULT_LENGTH_Y	(200.0f) //通常状態のYの距離
+#define DEFAULT_LENGTH_Z	(-500.0f) //通常状態のZの距離
+#define EDIT_LENGTH_Y	(1020.0f) //通常状態のYの距離
+#define EDIT_LENGTH_Z	(-13.0f) //通常状態のZの距離
 
 typedef enum
 {
@@ -31,6 +32,7 @@ typedef struct
 	D3DXMATRIX mtxView; //ビューマトリックス
 	CAMERATYPE type;
 	D3DXVECTOR3 rotmove; //回転量
+	bool bEditFollow;
 	float fLength;
 	float fAngle;
 }Camera;

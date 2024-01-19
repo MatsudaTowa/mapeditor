@@ -7,6 +7,7 @@
 #include "main.h"
 #include "camera.h"
 #include "input.h"
+#include "cursor.h"
 #include "edit.h"
 #include <stdio.h>
 
@@ -24,13 +25,14 @@ bool g_bType;
 //=============================================
 void InitCamera(void)
 {
-	g_Camera.posV = D3DXVECTOR3(0.0f, 1020.0f, -13.0f); //視点
+	g_Camera.posV = D3DXVECTOR3(0.0f, DEFAULT_LENGTH_Y, DEFAULT_LENGTH_Z); //視点
 	g_Camera.posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f); //注視
 	g_Camera.vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 	g_Camera.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	g_Camera.moveV = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	g_Camera.moveR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	g_Camera.rotmove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	g_Camera.bEditFollow = false; //追従するかどうか
 	g_Camera.type = CAMERATYPE_DEFAULT;
 
 	//対角線の長さを算出する
@@ -60,10 +62,6 @@ void UninitCamera(void)
 void UpdateCamera(void)
 {
 
-	D3DXVECTOR3 vecCamera = g_Camera.posR - g_Camera.posV;
-	//g_Camera.fLength = sqrtf(vecCamera.y * vecCamera.y + vecCamera.z * vecCamera.z);
-
-
 	if (g_Camera.rot.y > D3DX_PI)
 	{
 		g_Camera.rot.y = -D3DX_PI;
@@ -90,8 +88,6 @@ void UpdateCamera(void)
 
 	//g_Camera.fAngle = atan2f(x, z) + ((D3DX_PI * 0.05f) * vec.x);
 
-#ifdef _DEBUG
-
 	if (GetKeyboardTrigger(DIK_F11) == true)
 	{
 		if (g_Camera.type != CAMERATYPE_TURN)
@@ -103,6 +99,7 @@ void UpdateCamera(void)
 			g_Camera.type = CAMERATYPE_DEFAULT;
 		}
 	}
+	
 	if (GetKeyboardTrigger(DIK_F10) == true)
 	{
 		if (g_Camera.type != CAMERATYPE_EDIT)
@@ -115,7 +112,6 @@ void UpdateCamera(void)
 		}
 	}
 
-#endif // DEBUG
 	if (g_Camera.type == CAMERATYPE_DEFAULT)
 	{
 		if (GetKeyboardPress(DIK_J) == true)
@@ -161,67 +157,50 @@ void UpdateCamera(void)
 
 		if (GetKeyboardPress(DIK_Q) == true || GetJoypadPress(JOYKEY_LB) == true)
 		{
-#if TEST_ROT
 			g_Camera.rot.y -= 0.02f;
-
-			g_Camera.fAngle -= 0.02f;
-
-			g_Camera.posR.x = g_Camera.posV.x + sinf(g_Camera.rot.y) * g_Camera.fLength;
-			g_Camera.posR.y = g_Camera.posV.y - 100;
-			g_Camera.posR.z = g_Camera.posV.z + cosf(g_Camera.rot.y) * g_Camera.fLength;
-#else
-			g_Camera.rot.y -= 0.02f;
-
 
 			g_Camera.posR.x = g_Camera.posV.x + sinf(g_Camera.rot.y) * g_Camera.fLength;
 			g_Camera.posR.z = g_Camera.posV.z + cosf(g_Camera.rot.y) * g_Camera.fLength;
-#endif
+
 		}
 
 		if (GetKeyboardPress(DIK_E) == true || GetJoypadPress(JOYKEY_B) == true)
 		{
-#if TEST_ROT
-
 			g_Camera.rot.y += 0.02f;
-
-			g_Camera.fAngle += 0.02f;
-
-			g_Camera.posR.x = g_Camera.posV.x + sinf(g_Camera.fAngle) * g_Camera.fLength;
-			g_Camera.posR.y = g_Camera.posV.y - 100;
-			g_Camera.posR.z = g_Camera.posV.z + cosf(g_Camera.fAngle) * g_Camera.fLength;
-#else
-			g_Camera.rot.y += 0.02f;
-
 			g_Camera.posR.x = g_Camera.posV.x + sinf(g_Camera.rot.y) * g_Camera.fLength;
 			g_Camera.posR.z = g_Camera.posV.z + cosf(g_Camera.rot.y) * g_Camera.fLength;
-#endif
 		}
 
 		if (GetKeyboardPress(DIK_U) == true || GetJoypadPress(JOYKEY_LB) == true)
 		{
 			g_Camera.rot.y-= 0.02f;
+
 			g_Camera.posV.x = g_Camera.posR.x - sinf(g_Camera.rot.y) * g_Camera.fLength;
+			g_Camera.posV.y = DEFAULT_LENGTH_Y;
 			g_Camera.posV.z = g_Camera.posR.z - cosf(g_Camera.rot.y) * g_Camera.fLength;
 		}
 
 		if (GetKeyboardPress(DIK_O) == true || GetJoypadPress(JOYKEY_RB) == true)
 		{
 			g_Camera.rot.y += 0.02f;
+
 			g_Camera.posV.x = g_Camera.posR.x - sinf(g_Camera.rot.y) * g_Camera.fLength;
+			g_Camera.posV.y = DEFAULT_LENGTH_Y;
 			g_Camera.posV.z = g_Camera.posR.z - cosf(g_Camera.rot.y) * g_Camera.fLength;
 		}
+
 
 		if (GetKeyboardPress(DIK_T) == true)
 		{
 			g_Camera.rot.x += 0.02f;
-			g_Camera.posV.y = g_Camera.posR.y - sinf(g_Camera.rot.x) * g_Camera.fLength;
-			g_Camera.posV.z = g_Camera.posR.z - cosf(g_Camera.rot.x) * g_Camera.fLength;
+			g_Camera.posR.y = g_Camera.posV.y + sinf(g_Camera.rot.x) * g_Camera.fLength;
+			g_Camera.posR.z = g_Camera.posV.z + cosf(g_Camera.rot.x) * g_Camera.fLength;
 		}
 		if (GetKeyboardPress(DIK_Y) == true)
 		{
 			g_Camera.rot.x -= 0.02f;
-			g_Camera.posV.y = g_Camera.posR.y - sinf(g_Camera.rot.x) * g_Camera.fLength;
-			g_Camera.posV.z = g_Camera.posR.z - cosf(g_Camera.rot.x) * g_Camera.fLength;
+			g_Camera.posR.y = g_Camera.posV.y + sinf(g_Camera.rot.x) * g_Camera.fLength;
+			g_Camera.posR.z = g_Camera.posV.z + cosf(g_Camera.rot.x) * g_Camera.fLength;
 		}
 	}
 
@@ -242,6 +221,8 @@ void UpdateCamera(void)
 	g_Camera.moveR.y += (0.0f - g_Camera.moveR.y) * DAMPING_COEFFICIENT;
 	g_Camera.moveR.z += (0.0f - g_Camera.moveR.z) * DAMPING_COEFFICIENT;
 
+
+
 	//g_Camera.pos = pPlayer->pos;
 
 }
@@ -251,10 +232,18 @@ void UpdateCamera(void)
 //=============================================
 void EditCamera(void)
 {
-	EditModelInfo* pEditModel = GetEditModelinfo();
-	Edit* pEdit = GetEdit();
+	g_Camera.posV = D3DXVECTOR3(0.0f, EDIT_LENGTH_Y, EDIT_LENGTH_Z); //視点
 
-	g_Camera.posR = pEditModel[pEdit->nEditModelNumber].pos;
+	Cursol* pCursol = GetCursol();
+	Edit* pEdit = GetEdit();
+	if (GetKeyboardTrigger(DIK_F7) == true)
+	{
+		g_Camera.bEditFollow = g_Camera.bEditFollow ? false : true;
+	}
+	if (g_Camera.bEditFollow == true)
+	{//追従する
+		g_Camera.posR = pCursol->pos;
+	}
 
 	if (GetKeyboardPress(DIK_Q) == true || GetJoypadPress(JOYKEY_X) == true)
 	{
@@ -269,30 +258,29 @@ void EditCamera(void)
 	if (GetKeyboardPress(DIK_U) == true || GetJoypadPress(JOYKEY_LB) == true)
 	{
 		g_Camera.rot.y -= 0.02f;
-		g_Camera.posV.x = g_Camera.posR.x - sinf(g_Camera.rot.y) * PLAYER_LENGTH_Z;
-		g_Camera.posV.z = g_Camera.posR.z - cosf(g_Camera.rot.y) * PLAYER_LENGTH_Z;
+		g_Camera.posV.x = g_Camera.posR.x - sinf(g_Camera.rot.y) * EDIT_LENGTH_Z;
+		g_Camera.posV.z = g_Camera.posR.z - cosf(g_Camera.rot.y) * EDIT_LENGTH_Z;
 	}
 
 	if (GetKeyboardPress(DIK_O) == true || GetJoypadPress(JOYKEY_RB) == true)
 	{
 		g_Camera.rot.y += 0.02f;
-		g_Camera.posV.x = g_Camera.posR.x - sinf(g_Camera.rot.y) * PLAYER_LENGTH_Z;
-		g_Camera.posV.z = g_Camera.posR.z - cosf(g_Camera.rot.y) * PLAYER_LENGTH_Z;
+		g_Camera.posV.x = g_Camera.posR.x - sinf(g_Camera.rot.y) * EDIT_LENGTH_Z;
+		g_Camera.posV.z = g_Camera.posR.z - cosf(g_Camera.rot.y) * EDIT_LENGTH_Z;
 	}
 
 	if (GetKeyboardPress(DIK_T) == true)
 	{
 		g_Camera.rot.x += 0.02f;
-		g_Camera.posV.y = g_Camera.posR.y - sinf(g_Camera.rot.x) * PLAYER_LENGTH_Z;
-		g_Camera.posV.z = g_Camera.posR.z - cosf(g_Camera.rot.x) * PLAYER_LENGTH_Z;
+		g_Camera.posV.y = g_Camera.posR.y - sinf(g_Camera.rot.x) * EDIT_LENGTH_Z;
+		g_Camera.posV.z = g_Camera.posR.z - cosf(g_Camera.rot.x) * EDIT_LENGTH_Z;
 	}
 	if (GetKeyboardPress(DIK_Y) == true)
 	{
 		g_Camera.rot.x -= 0.02f;
-		g_Camera.posV.y = g_Camera.posR.y - sinf(g_Camera.rot.x) * PLAYER_LENGTH_Z;
-		g_Camera.posV.z = g_Camera.posR.z - cosf(g_Camera.rot.x) * PLAYER_LENGTH_Z;
+		g_Camera.posV.y = g_Camera.posR.y - sinf(g_Camera.rot.x) * EDIT_LENGTH_Z;
+		g_Camera.posV.z = g_Camera.posR.z - cosf(g_Camera.rot.x) * EDIT_LENGTH_Z;
 	}
-
 }
 
 //=============================================
@@ -332,7 +320,7 @@ void SetCamera(void)
 	D3DXVECTOR3 posV = g_Camera.posV;
 	D3DXVECTOR3 posR = g_Camera.posR;
 
-	posV.y += -15.0f;
+	posV.y += 0.0f;
 	posR.y += 0.0f;
 
 	//ビューマトリックスの作成
@@ -351,8 +339,10 @@ void DebagCameraPos(void)
 	RECT rect = { 0,0,SCREEN_WIDTH,SCREEN_HEIGHT };
 	char aStr[256];
 
-	sprintf(&aStr[0], "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n[カメラ情報]\nposV:%.1f,%.1f,%.1f\nposR:%.1f,%.1f,%.1f", g_Camera.posV.x, g_Camera.posV.y, g_Camera.posV.z
-		,g_Camera.posR.x, g_Camera.posR.y, g_Camera.posR.z);
+	sprintf(&aStr[0], "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n[カメラ情報]\nposV:%.1f,%.1f,%.1f\nposR:%.1f,%.1f,%.1f\nrot:%.1f,%.1f,%.1f"
+		, g_Camera.posV.x, g_Camera.posV.y, g_Camera.posV.z
+		,g_Camera.posR.x, g_Camera.posR.y, g_Camera.posR.z
+		,g_Camera.rot.x,g_Camera.rot.y,g_Camera.rot.z);
 
 	//テキストの描画
 	pFont->DrawText(NULL, &aStr[0], -1, &rect, DT_LEFT, D3DCOLOR_RGBA(255, 255, 255, 255));

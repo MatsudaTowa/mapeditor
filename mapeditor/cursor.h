@@ -25,6 +25,7 @@ void UninitCursor(void);
 void UpdateCursor(void);
 void DrawCursor(void);
 void SetCursor(D3DXVECTOR3 pos);
+Cursol* GetCursol(void);
 
 #endif // _CURSOR_H_ //’è‹`‚³‚ê‚Ä‚È‚©‚Á‚½‚ç
 

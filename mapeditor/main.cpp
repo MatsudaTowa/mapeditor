@@ -327,6 +327,9 @@ void Uninit(void)
 //=============================================
 void Update(void)
 {
+	Camera* pCamera = GetCamera();
+	Cursol* pCursol = GetCursol();
+
 	//キーボードの更新処理
 	UpdateKeyboard();
 
@@ -343,8 +346,17 @@ void Update(void)
 	if (GetKeyboardTrigger(DIK_F2) == true)
 	{
 		g_bEdit = g_bEdit ? false : true;
+		if (g_bEdit == false)
+		{
+			//カメラをゲーム視点に戻す
+			pCamera->type = CAMERATYPE_DEFAULT;
+			pCamera->posV = D3DXVECTOR3(0.0f, DEFAULT_LENGTH_Y, DEFAULT_LENGTH_Z); //視点
+
+			//カーソルの表示を消す
+			pCursol->bUse = false;
+		}
 	}
-	if (GetKeyboardTrigger(DIK_F3) == true)
+	else if (GetKeyboardTrigger(DIK_F3) == true)
 	{
 		g_bReSave = g_bReSave ? false : true;
 		if (g_bReSave == true)
@@ -353,13 +365,24 @@ void Update(void)
 			reSaveWall();
 			reSaveField();
 		}
+		if (g_bReSave == false)
+		{
+			//カメラをゲーム視点に戻す
+			pCamera->type = CAMERATYPE_DEFAULT;
+			pCamera->posV = D3DXVECTOR3(0.0f, DEFAULT_LENGTH_Y, DEFAULT_LENGTH_Z); //視点
+
+			//カーソルの表示を消す
+			pCursol->bUse = false;
+		}
 	}
 	if (g_bReSave == true)
 	{
+		pCamera->type = CAMERATYPE_EDIT;
 		reSaveEdit();
 	}
 	if (g_bEdit == true)
 	{
+		pCamera->type = CAMERATYPE_EDIT;
 		UpdateEdit();
 	}
 	else
