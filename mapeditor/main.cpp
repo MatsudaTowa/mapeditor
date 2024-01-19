@@ -346,7 +346,11 @@ void Update(void)
 	if (GetKeyboardTrigger(DIK_F2) == true)
 	{
 		g_bEdit = g_bEdit ? false : true;
-		if (g_bEdit == false)
+		if (g_bEdit == true)
+		{
+			pCamera->posV = D3DXVECTOR3(0.0f, EDIT_LENGTH_Y, -EDIT_LENGTH_Z); //視点
+		}
+		else if (g_bEdit == false)
 		{
 			//カメラをゲーム視点に戻す
 			pCamera->type = CAMERATYPE_DEFAULT;
@@ -361,6 +365,7 @@ void Update(void)
 		g_bReSave = g_bReSave ? false : true;
 		if (g_bReSave == true)
 		{
+			pCamera->posV = D3DXVECTOR3(0.0f, EDIT_LENGTH_Y, -EDIT_LENGTH_Z); //視点
 			reSaveModel();
 			reSaveWall();
 			reSaveField();
@@ -378,11 +383,13 @@ void Update(void)
 	if (g_bReSave == true)
 	{
 		pCamera->type = CAMERATYPE_EDIT;
+
 		reSaveEdit();
 	}
 	if (g_bEdit == true)
 	{
 		pCamera->type = CAMERATYPE_EDIT;
+
 		UpdateEdit();
 	}
 	else

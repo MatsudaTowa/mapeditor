@@ -9,7 +9,7 @@
 #define DEFAULT_LENGTH_Y	(200.0f) //’Êíó‘Ô‚ÌY‚Ì‹——£
 #define DEFAULT_LENGTH_Z	(-500.0f) //’Êíó‘Ô‚ÌZ‚Ì‹——£
 #define EDIT_LENGTH_Y	(1020.0f) //’Êíó‘Ô‚ÌY‚Ì‹——£
-#define EDIT_LENGTH_Z	(-13.0f) //’Êíó‘Ô‚ÌZ‚Ì‹——£
+#define EDIT_LENGTH_Z	(13.0f) //’Êíó‘Ô‚ÌZ‚Ì‹——£
 
 typedef enum
 {

@@ -29,6 +29,9 @@ typedef enum
 typedef struct
 {
 	EDITTYPE EditType;
+	D3DXVECTOR3 Modelmove;
+	D3DXVECTOR3 Wallmove;
+	D3DXVECTOR3 Fieldmove;
 	bool bCursorType;
 	int nEditModelNumber; //’Ç]‚·‚éƒJƒƒ‰‚Ì‘ÎÛ
 	int nEditWallNumber; //’Ç]‚·‚éƒJƒƒ‰‚Ì‘ÎÛ

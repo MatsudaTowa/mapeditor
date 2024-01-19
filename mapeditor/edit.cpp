@@ -15,12 +15,9 @@
 #include <stdio.h>
 //マクロ定義
 #define NUM_KEY_MAX	(256)
-#define MOVE_CURSOR	(2.0f) //カーソル移動値
+#define MOVE_CURSOR	(1.0f) //カーソル移動値
 #define CHANGE_SIZE	(5.0f) //壁のサイズ変更
-#define EDIT_WIDE	(1280) //敵を置ける最大値
-#define EDIT_HEIGHT	(700) //敵を置ける最大値
-#define ENEMY_LIFE	(3) //敵のライフ
-#define TIME_CHANGE	(5) //時間を進める
+#define DAMPING_COEFFICIENT	(0.2f) //抵抗力
 
 //=============================================
 //グローバル変数
@@ -96,6 +93,13 @@ void InitEdit(void)
 	g_Edit.nEditModelNumber = 0;
 	//追従する壁の初期化
 	g_Edit.nEditWallNumber = 0;
+
+	//モデルのカーソルのムーブ値の初期化
+	g_Edit.Modelmove = D3DXVECTOR3(0.0f,0.0f,0.0f);
+	//床のカーソルのムーブ値の初期化
+	g_Edit.Fieldmove = D3DXVECTOR3(0.0f,0.0f,0.0f); 
+	//壁のカーソルのムーブ値の初期化
+	g_Edit.Wallmove = D3DXVECTOR3(0.0f,0.0f,0.0f); 
 
 	g_pVtx = 0;
 	g_pVtxField = 0;
@@ -556,6 +560,7 @@ void SaveModel(void)
 {
 	LPDIRECT3DDEVICE9 pDevice;
 	//int nCntEdit;
+	Camera* pCamera = GetCamera();
 	//デバイスの取得
 	pDevice = GetDevice();
 
@@ -563,22 +568,64 @@ void SaveModel(void)
 	VERTEX_3D* pVtx;
 	g_pVtxBuffWallEdit->Lock(0, 0, (void**)&pVtx, 0);
 
-	if (GetKeyboardPress(DIK_W) == true)
-	{
-		g_EditModelInfo[g_Edit.nEditModelNumber].pos.z += MOVE_CURSOR
-			;
+	D3DXVECTOR3 vecDirection(0.0f, 0.0f, 0.0f);
+	if (GetKeyboardPress(DIK_W) || GetJoypadPress(JOYKEY_UP))
+	{ // 上。
+		vecDirection.z += 1.0f;
 	}
-	if (GetKeyboardPress(DIK_S) == true)
+	if (GetKeyboardPress(DIK_A) || GetJoypadPress(JOYKEY_LEFT))
 	{
-		g_EditModelInfo[g_Edit.nEditModelNumber].pos.z -= MOVE_CURSOR;
+		vecDirection.x -= 1.0f;
 	}
-	if (GetKeyboardPress(DIK_A) == true)
+	if (GetKeyboardPress(DIK_D) || GetJoypadPress(JOYKEY_RIGHT))
 	{
-		g_EditModelInfo[g_Edit.nEditModelNumber].pos.x -= MOVE_CURSOR;
+		vecDirection.x += 1.0f;
 	}
-	if (GetKeyboardPress(DIK_D) == true)
+	if (GetKeyboardPress(DIK_S) || GetJoypadPress(JOYKEY_DOWN))
 	{
-		g_EditModelInfo[g_Edit.nEditModelNumber].pos.x += MOVE_CURSOR;
+		vecDirection.z -= 1.0f;
+	}
+
+	if (vecDirection.x == 0.0f && vecDirection.z == 0.0f)
+	{ // 動いてない。
+		g_Edit.Modelmove.x = 0.0f;
+		g_Edit.Modelmove.z = 0.0f;
+	}
+	else
+	{
+		float rotMoveY = pCamera->rot.y + atan2f(vecDirection.x, vecDirection.z);
+
+		g_Edit.Modelmove.x += sinf(rotMoveY) * MOVE_CURSOR;
+		g_Edit.Modelmove.z += cosf(rotMoveY) * MOVE_CURSOR;
+		g_EditModelInfo[g_Edit.nEditModelNumber].pos.x += g_Edit.Modelmove.x;
+		g_EditModelInfo[g_Edit.nEditModelNumber].pos.z += g_Edit.Modelmove.z;
+		g_Edit.Modelmove *= 1.0f - DAMPING_COEFFICIENT;
+	}
+
+	//if (GetKeyboardPress(DIK_W) == true)
+	//{
+	//	g_EditModelInfo[g_Edit.nEditModelNumber].pos.z += sinf(pCamera->rot.y) * MOVE_CURSOR
+	//		;
+	//}
+	//if (GetKeyboardPress(DIK_S) == true)
+	//{
+	//	g_EditModelInfo[g_Edit.nEditModelNumber].pos.z -= MOVE_CURSOR;
+	//}
+	//if (GetKeyboardPress(DIK_A) == true)
+	//{
+	//	g_EditModelInfo[g_Edit.nEditModelNumber].pos.x -= MOVE_CURSOR;
+	//}
+	//if (GetKeyboardPress(DIK_D) == true)
+	//{
+	//	g_EditModelInfo[g_Edit.nEditModelNumber].pos.x += MOVE_CURSOR;
+	//}
+	if (GetKeyboardPress(DIK_TAB) == true)
+	{
+		g_EditModelInfo[g_Edit.nEditModelNumber].pos.y += MOVE_CURSOR;
+	}
+	if (GetKeyboardPress(DIK_LSHIFT) == true)
+	{
+		g_EditModelInfo[g_Edit.nEditModelNumber].pos.y -= MOVE_CURSOR;
 	}
 
 	if (GetKeyboardTrigger(DIK_RIGHT) == true)
@@ -711,6 +758,14 @@ void CorrectionModel(void)
 	if (GetKeyboardPress(DIK_D) == true)
 	{
 		g_EditModelInfo[g_Edit.nEditModelNumber].pos.x += MOVE_CURSOR;
+	}
+	if (GetKeyboardPress(DIK_TAB) == true)
+	{
+		g_EditModelInfo[g_Edit.nEditModelNumber].pos.y += MOVE_CURSOR;
+	}
+	if (GetKeyboardPress(DIK_LSHIFT) == true)
+	{
+		g_EditModelInfo[g_Edit.nEditModelNumber].pos.y -= MOVE_CURSOR;
 	}
 
 	if (GetKeyboardTrigger(DIK_RIGHT) == true)
