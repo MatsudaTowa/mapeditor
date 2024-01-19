@@ -348,7 +348,6 @@ void Update(void)
 		g_bEdit = g_bEdit ? false : true;
 		if (g_bEdit == true)
 		{
-			pCamera->posV = D3DXVECTOR3(0.0f, EDIT_LENGTH_Y, -EDIT_LENGTH_Z); //Ž‹“_
 		}
 		else if (g_bEdit == false)
 		{

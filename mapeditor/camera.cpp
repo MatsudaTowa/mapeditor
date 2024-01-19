@@ -399,7 +399,7 @@ void DebagCameraPos(void)
 	RECT rect = { 0,0,SCREEN_WIDTH,SCREEN_HEIGHT };
 	char aStr[256];
 
-	sprintf(&aStr[0], "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n[カメラ情報]\nposV:%.1f,%.1f,%.1f\nposR:%.1f,%.1f,%.1f\nrot:%.1f,%.1f,%.1f\nF7:カーソルの追従（エディット時のみ） \nF8:カメラの視点変更"
+	sprintf(&aStr[0], "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n[カメラ情報]\nposV:%.1f,%.1f,%.1f\nposR:%.1f,%.1f,%.1f\nrot:%.1f,%.1f,%.1f\nF7:カーソルの追従（エディット時のみ） \nF8:カメラの視点変更"
 		, g_Camera.posV.x, g_Camera.posV.y, g_Camera.posV.z
 		,g_Camera.posR.x, g_Camera.posR.y, g_Camera.posR.z
 		,g_Camera.rot.x,g_Camera.rot.y,g_Camera.rot.z);

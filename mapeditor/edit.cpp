@@ -2342,9 +2342,9 @@ void DebagEdit(void)
 {
 	LPD3DXFONT pFont = GetFont();
 	RECT rect = { 0,0,SCREEN_WIDTH,SCREEN_HEIGHT };
-	char aStr[256];
+	char aStr[500];
 
-	sprintf(&aStr[0], "操作方法\n[カメラ移動]\n前進:I 後進:K 左:J 右:L\nモデル設置モード:1 モデル編集モード:2 壁設置モード:3 壁編集モード:4 床設置モード:5 床編集モード:6\n物の設置:0\n物の移動	前進:W 後進:S 左:A 右:D\nタイプの切り替え→or← カーソル切り替え↑or↓");
+	sprintf(&aStr[0], "操作方法\n[カメラ移動]\n前進:I 後進:K 左:J 右:L\nF2:エディットモード\nF3:再設置モード\nF5:カーソルの移動方法変更\nモデル設置モード:1 モデル編集モード:2 壁設置モード:3 壁編集モード:4 床設置モード:5 床編集モード:6\n物の設置:0\n物の移動	前進:W 後進:S 左:A 右:D 回転:ZorC\nタイプの切り替え→or← カーソル切り替え↑or↓\nF4でファイル書き出し");
 
 	//テキストの描画
 	pFont->DrawText(NULL, &aStr[0], -1, &rect, DT_LEFT, D3DCOLOR_RGBA(255, 255, 255, 255));
@@ -2359,7 +2359,7 @@ void DebagInfo(void)
 	RECT rect = { 0,0,SCREEN_WIDTH,SCREEN_HEIGHT };
 	char aStr[256];
 
-	sprintf(&aStr[0], "\n\n\n\n\n\n\n\n[モデル]\npos:%.1f,%.1f,%.1f\nrot:%.1f,%.1f,%.1f\n\n[壁]\npos:%.1f,%.1f,%.1f\nrot:%.1f,%.1f,%.1f\nwide:%.1f\nheight:%.1f\n\n[床]\npos:%.1f,%.1f,%.1f\nrot:%.1f,%.1f,%.1f\nwide:%.1f\ndepth:%.1f",
+	sprintf(&aStr[0], "\n\n\n\n\n\n\n\n\n\n\n\n[モデル]\npos:%.1f,%.1f,%.1f\nrot:%.1f,%.1f,%.1f\n\n[壁]\npos:%.1f,%.1f,%.1f\nrot:%.1f,%.1f,%.1f\nwide:%.1f\nheight:%.1f\n\n[床]\npos:%.1f,%.1f,%.1f\nrot:%.1f,%.1f,%.1f\nwide:%.1f\ndepth:%.1f",
 		g_EditModelInfo[g_Edit.nEditModelNumber].pos.x,
 		g_EditModelInfo[g_Edit.nEditModelNumber].pos.y,
 		g_EditModelInfo[g_Edit.nEditModelNumber].pos.z,
