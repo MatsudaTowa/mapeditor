@@ -18,6 +18,7 @@
 #define MOVE_CURSOR	(1.0f) //カーソル移動値
 #define CHANGE_SIZE	(5.0f) //壁のサイズ変更
 #define DAMPING_COEFFICIENT	(0.2f) //抵抗力
+#define TURN_SPEED	(0.1f) //回転
 
 //=============================================
 //グローバル変数
@@ -602,23 +603,6 @@ void SaveModel(void)
 		g_Edit.Modelmove *= 1.0f - DAMPING_COEFFICIENT;
 	}
 
-	//if (GetKeyboardPress(DIK_W) == true)
-	//{
-	//	g_EditModelInfo[g_Edit.nEditModelNumber].pos.z += sinf(pCamera->rot.y) * MOVE_CURSOR
-	//		;
-	//}
-	//if (GetKeyboardPress(DIK_S) == true)
-	//{
-	//	g_EditModelInfo[g_Edit.nEditModelNumber].pos.z -= MOVE_CURSOR;
-	//}
-	//if (GetKeyboardPress(DIK_A) == true)
-	//{
-	//	g_EditModelInfo[g_Edit.nEditModelNumber].pos.x -= MOVE_CURSOR;
-	//}
-	//if (GetKeyboardPress(DIK_D) == true)
-	//{
-	//	g_EditModelInfo[g_Edit.nEditModelNumber].pos.x += MOVE_CURSOR;
-	//}
 	if (GetKeyboardPress(DIK_TAB) == true)
 	{
 		g_EditModelInfo[g_Edit.nEditModelNumber].pos.y += MOVE_CURSOR;
@@ -626,6 +610,24 @@ void SaveModel(void)
 	if (GetKeyboardPress(DIK_LSHIFT) == true)
 	{
 		g_EditModelInfo[g_Edit.nEditModelNumber].pos.y -= MOVE_CURSOR;
+	}
+
+	//モデルのrot回転
+	if (GetKeyboardPress(DIK_C) == true)
+	{
+		g_EditModelInfo[g_Edit.nEditModelNumber].rot.y += TURN_SPEED;
+		if (g_EditModelInfo[g_Edit.nEditModelNumber].rot.y > D3DX_PI)
+		{
+			g_EditModelInfo[g_Edit.nEditModelNumber].rot.y = -D3DX_PI;
+		}
+	}
+	else if (GetKeyboardPress(DIK_Z) == true)
+	{
+		g_EditModelInfo[g_Edit.nEditModelNumber].rot.y -= TURN_SPEED;
+		if (g_EditModelInfo[g_Edit.nEditModelNumber].rot.y < -D3DX_PI)
+		{
+			g_EditModelInfo[g_Edit.nEditModelNumber].rot.y = D3DX_PI;
+		}
 	}
 
 	if (GetKeyboardTrigger(DIK_RIGHT) == true)
@@ -721,6 +723,8 @@ void CorrectionModel(void)
 	//デバイスの取得
 	pDevice = GetDevice();
 
+	Camera* pCamera = GetCamera();
+
 	//Enemy* pEnemy = GetEnemy();
 	VERTEX_3D* pVtx;
 	g_pVtxBuffWallEdit->Lock(0, 0, (void**)&pVtx, 0);
@@ -742,23 +746,40 @@ void CorrectionModel(void)
 		}
 	}
 
-	if (GetKeyboardPress(DIK_W) == true)
-	{
-		g_EditModelInfo[g_Edit.nEditModelNumber].pos.z += MOVE_CURSOR
-			;
+	D3DXVECTOR3 vecDirection(0.0f, 0.0f, 0.0f);
+	if (GetKeyboardPress(DIK_W) || GetJoypadPress(JOYKEY_UP))
+	{ // 上。
+		vecDirection.z += 1.0f;
 	}
-	if (GetKeyboardPress(DIK_S) == true)
+	if (GetKeyboardPress(DIK_A) || GetJoypadPress(JOYKEY_LEFT))
 	{
-		g_EditModelInfo[g_Edit.nEditModelNumber].pos.z -= MOVE_CURSOR;
+		vecDirection.x -= 1.0f;
 	}
-	if (GetKeyboardPress(DIK_A) == true)
+	if (GetKeyboardPress(DIK_D) || GetJoypadPress(JOYKEY_RIGHT))
 	{
-		g_EditModelInfo[g_Edit.nEditModelNumber].pos.x -= MOVE_CURSOR;
+		vecDirection.x += 1.0f;
 	}
-	if (GetKeyboardPress(DIK_D) == true)
+	if (GetKeyboardPress(DIK_S) || GetJoypadPress(JOYKEY_DOWN))
 	{
-		g_EditModelInfo[g_Edit.nEditModelNumber].pos.x += MOVE_CURSOR;
+		vecDirection.z -= 1.0f;
 	}
+
+	if (vecDirection.x == 0.0f && vecDirection.z == 0.0f)
+	{ // 動いてない。
+		g_Edit.Modelmove.x = 0.0f;
+		g_Edit.Modelmove.z = 0.0f;
+	}
+	else
+	{
+		float rotMoveY = pCamera->rot.y + atan2f(vecDirection.x, vecDirection.z);
+
+		g_Edit.Modelmove.x += sinf(rotMoveY) * MOVE_CURSOR;
+		g_Edit.Modelmove.z += cosf(rotMoveY) * MOVE_CURSOR;
+		g_EditModelInfo[g_Edit.nEditModelNumber].pos.x += g_Edit.Modelmove.x;
+		g_EditModelInfo[g_Edit.nEditModelNumber].pos.z += g_Edit.Modelmove.z;
+		g_Edit.Modelmove *= 1.0f - DAMPING_COEFFICIENT;
+	}
+
 	if (GetKeyboardPress(DIK_TAB) == true)
 	{
 		g_EditModelInfo[g_Edit.nEditModelNumber].pos.y += MOVE_CURSOR;
@@ -766,6 +787,24 @@ void CorrectionModel(void)
 	if (GetKeyboardPress(DIK_LSHIFT) == true)
 	{
 		g_EditModelInfo[g_Edit.nEditModelNumber].pos.y -= MOVE_CURSOR;
+	}
+
+	//壁のrot回転
+	if (GetKeyboardPress(DIK_C) == true)
+	{
+		g_EditModelInfo[g_Edit.nEditModelNumber].rot.y += TURN_SPEED;
+		if (g_EditModelInfo[g_Edit.nEditModelNumber].rot.y > D3DX_PI)
+		{
+			g_EditModelInfo[g_Edit.nEditModelNumber].rot.y = -D3DX_PI;
+		}
+	}
+	else if (GetKeyboardPress(DIK_Z) == true)
+	{
+		g_EditModelInfo[g_Edit.nEditModelNumber].rot.y -= TURN_SPEED;
+		if (g_EditModelInfo[g_Edit.nEditModelNumber].rot.y < -D3DX_PI)
+		{
+			g_EditModelInfo[g_Edit.nEditModelNumber].rot.y = D3DX_PI;
+		}
 	}
 
 	if (GetKeyboardTrigger(DIK_RIGHT) == true)
@@ -871,6 +910,8 @@ void SaveWall(void)
 	//デバイスの取得
 	pDevice = GetDevice();
 
+	Camera* pCamera = GetCamera();
+
 	//Enemy* pEnemy = GetEnemy();
 	VERTEX_3D* pVtx;
 	g_pVtxBuffWallEdit->Lock(0, 0, (void**)&pVtx, 0);
@@ -878,21 +919,38 @@ void SaveWall(void)
 	//壁の情報変更
 	if (g_Edit.bCursorType == true)
 	{//プレス
-		if (GetKeyboardPress(DIK_W) == true)
-		{
-			g_EditWallInfo[g_Edit.nEditWallNumber].pos.z += MOVE_CURSOR;
+		D3DXVECTOR3 vecDirection(0.0f, 0.0f, 0.0f);
+		if (GetKeyboardPress(DIK_W) || GetJoypadPress(JOYKEY_UP))
+		{ // 上。
+			vecDirection.z += 1.0f;
 		}
-		if (GetKeyboardPress(DIK_S) == true)
+		if (GetKeyboardPress(DIK_A) || GetJoypadPress(JOYKEY_LEFT))
 		{
-			g_EditWallInfo[g_Edit.nEditWallNumber].pos.z -= MOVE_CURSOR;
+			vecDirection.x -= 1.0f;
 		}
-		if (GetKeyboardPress(DIK_A) == true)
+		if (GetKeyboardPress(DIK_D) || GetJoypadPress(JOYKEY_RIGHT))
 		{
-			g_EditWallInfo[g_Edit.nEditWallNumber].pos.x -= MOVE_CURSOR;
+			vecDirection.x += 1.0f;
 		}
-		if (GetKeyboardPress(DIK_D) == true)
+		if (GetKeyboardPress(DIK_S) || GetJoypadPress(JOYKEY_DOWN))
 		{
-			g_EditWallInfo[g_Edit.nEditWallNumber].pos.x += MOVE_CURSOR;
+			vecDirection.z -= 1.0f;
+		}
+
+		if (vecDirection.x == 0.0f && vecDirection.z == 0.0f)
+		{ // 動いてない。
+			g_Edit.Wallmove.x = 0.0f;
+			g_Edit.Wallmove.z = 0.0f;
+		}
+		else
+		{
+			float rotMoveY = pCamera->rot.y + atan2f(vecDirection.x, vecDirection.z);
+
+			g_Edit.Wallmove.x += sinf(rotMoveY) * MOVE_CURSOR;
+			g_Edit.Wallmove.z += cosf(rotMoveY) * MOVE_CURSOR;
+			g_EditWallInfo[g_Edit.nEditWallNumber].pos.x += g_Edit.Wallmove.x;
+			g_EditWallInfo[g_Edit.nEditWallNumber].pos.z += g_Edit.Wallmove.z;
+			g_Edit.Wallmove *= 1.0f - DAMPING_COEFFICIENT;
 		}
 
 		//壁のサイズ変更
@@ -946,21 +1004,40 @@ void SaveWall(void)
 	}
 	else if (g_Edit.bCursorType == false)
 	{//トリガー
-		if (GetKeyboardTrigger(DIK_W) == true)
-		{
-			g_EditWallInfo[g_Edit.nEditWallNumber].pos.z += MOVE_CURSOR;
+	//壁の情報変更
+
+		D3DXVECTOR3 vecDirection(0.0f, 0.0f, 0.0f);
+		if (GetKeyboardTrigger(DIK_W) || GetJoypadTrigger(JOYKEY_UP))
+		{ // 上。
+			vecDirection.z += 1.0f;
 		}
-		if (GetKeyboardTrigger(DIK_S) == true)
+		if (GetKeyboardTrigger(DIK_A) || GetJoypadTrigger(JOYKEY_LEFT))
 		{
-			g_EditWallInfo[g_Edit.nEditWallNumber].pos.z -= MOVE_CURSOR;
+			vecDirection.x -= 1.0f;
 		}
-		if (GetKeyboardTrigger(DIK_A) == true)
+		if (GetKeyboardTrigger(DIK_D) || GetJoypadTrigger(JOYKEY_RIGHT))
 		{
-			g_EditWallInfo[g_Edit.nEditWallNumber].pos.x -= MOVE_CURSOR;
+			vecDirection.x += 1.0f;
 		}
-		if (GetKeyboardTrigger(DIK_D) == true)
+		if (GetKeyboardTrigger(DIK_S) || GetJoypadTrigger(JOYKEY_DOWN))
 		{
-			g_EditWallInfo[g_Edit.nEditWallNumber].pos.x += MOVE_CURSOR;
+			vecDirection.z -= 1.0f;
+		}
+
+		if (vecDirection.x == 0.0f && vecDirection.z == 0.0f)
+		{ // 動いてない。
+			g_Edit.Wallmove.x = 0.0f;
+			g_Edit.Wallmove.z = 0.0f;
+		}
+		else
+		{
+			float rotMoveY = pCamera->rot.y + atan2f(vecDirection.x, vecDirection.z);
+
+			g_Edit.Wallmove.x += sinf(rotMoveY) * MOVE_CURSOR;
+			g_Edit.Wallmove.z += cosf(rotMoveY) * MOVE_CURSOR;
+			g_EditWallInfo[g_Edit.nEditWallNumber].pos.x += g_Edit.Wallmove.x;
+			g_EditWallInfo[g_Edit.nEditWallNumber].pos.z += g_Edit.Wallmove.z;
+			g_Edit.Wallmove *= 1.0f - DAMPING_COEFFICIENT;
 		}
 
 		//壁のサイズ変更
@@ -1125,6 +1202,8 @@ void CorrectionWall(void)
 	//デバイスの取得
 	pDevice = GetDevice();
 
+	Camera* pCamera = GetCamera();
+
 	//Enemy* pEnemy = GetEnemy();
 	VERTEX_3D* pVtx;
 	g_pVtxBuffWallEdit->Lock(0, 0, (void**)&pVtx, 0);
@@ -1153,21 +1232,38 @@ void CorrectionWall(void)
 	//壁の情報変更
 	if (g_Edit.bCursorType == true)
 	{//プレス
-		if (GetKeyboardPress(DIK_W) == true)
-		{
-			g_EditWallInfo[g_Edit.nEditWallNumber].pos.z += MOVE_CURSOR;
+		D3DXVECTOR3 vecDirection(0.0f, 0.0f, 0.0f);
+		if (GetKeyboardPress(DIK_W) || GetJoypadPress(JOYKEY_UP))
+		{ // 上。
+			vecDirection.z += 1.0f;
 		}
-		if (GetKeyboardPress(DIK_S) == true)
+		if (GetKeyboardPress(DIK_A) || GetJoypadPress(JOYKEY_LEFT))
 		{
-			g_EditWallInfo[g_Edit.nEditWallNumber].pos.z -= MOVE_CURSOR;
+			vecDirection.x -= 1.0f;
 		}
-		if (GetKeyboardPress(DIK_A) == true)
+		if (GetKeyboardPress(DIK_D) || GetJoypadPress(JOYKEY_RIGHT))
 		{
-			g_EditWallInfo[g_Edit.nEditWallNumber].pos.x -= MOVE_CURSOR;
+			vecDirection.x += 1.0f;
 		}
-		if (GetKeyboardPress(DIK_D) == true)
+		if (GetKeyboardPress(DIK_S) || GetJoypadPress(JOYKEY_DOWN))
 		{
-			g_EditWallInfo[g_Edit.nEditWallNumber].pos.x += MOVE_CURSOR;
+			vecDirection.z -= 1.0f;
+		}
+
+		if (vecDirection.x == 0.0f && vecDirection.z == 0.0f)
+		{ // 動いてない。
+			g_Edit.Wallmove.x = 0.0f;
+			g_Edit.Wallmove.z = 0.0f;
+		}
+		else
+		{
+			float rotMoveY = pCamera->rot.y + atan2f(vecDirection.x, vecDirection.z);
+
+			g_Edit.Wallmove.x += sinf(rotMoveY) * MOVE_CURSOR;
+			g_Edit.Wallmove.z += cosf(rotMoveY) * MOVE_CURSOR;
+			g_EditWallInfo[g_Edit.nEditWallNumber].pos.x += g_Edit.Wallmove.x;
+			g_EditWallInfo[g_Edit.nEditWallNumber].pos.z += g_Edit.Wallmove.z;
+			g_Edit.Wallmove *= 1.0f - DAMPING_COEFFICIENT;
 		}
 
 		//壁のサイズ変更
@@ -1221,21 +1317,38 @@ void CorrectionWall(void)
 	}
 	else if (g_Edit.bCursorType == false)
 	{//トリガー
-		if (GetKeyboardTrigger(DIK_W) == true)
-		{
-			g_EditWallInfo[g_Edit.nEditWallNumber].pos.z += MOVE_CURSOR;
+		D3DXVECTOR3 vecDirection(0.0f, 0.0f, 0.0f);
+		if (GetKeyboardTrigger(DIK_W) || GetJoypadTrigger(JOYKEY_UP))
+		{ // 上。
+			vecDirection.z += 1.0f;
 		}
-		if (GetKeyboardTrigger(DIK_S) == true)
+		if (GetKeyboardTrigger(DIK_A) || GetJoypadTrigger(JOYKEY_LEFT))
 		{
-			g_EditWallInfo[g_Edit.nEditWallNumber].pos.z -= MOVE_CURSOR;
+			vecDirection.x -= 1.0f;
 		}
-		if (GetKeyboardTrigger(DIK_A) == true)
+		if (GetKeyboardTrigger(DIK_D) || GetJoypadTrigger(JOYKEY_RIGHT))
 		{
-			g_EditWallInfo[g_Edit.nEditWallNumber].pos.x -= MOVE_CURSOR;
+			vecDirection.x += 1.0f;
 		}
-		if (GetKeyboardTrigger(DIK_D) == true)
+		if (GetKeyboardTrigger(DIK_S) || GetJoypadTrigger(JOYKEY_DOWN))
 		{
-			g_EditWallInfo[g_Edit.nEditWallNumber].pos.x += MOVE_CURSOR;
+			vecDirection.z -= 1.0f;
+		}
+
+		if (vecDirection.x == 0.0f && vecDirection.z == 0.0f)
+		{ // 動いてない。
+			g_Edit.Wallmove.x = 0.0f;
+			g_Edit.Wallmove.z = 0.0f;
+		}
+		else
+		{
+			float rotMoveY = pCamera->rot.y + atan2f(vecDirection.x, vecDirection.z);
+
+			g_Edit.Wallmove.x += sinf(rotMoveY) * MOVE_CURSOR;
+			g_Edit.Wallmove.z += cosf(rotMoveY) * MOVE_CURSOR;
+			g_EditWallInfo[g_Edit.nEditWallNumber].pos.x += g_Edit.Wallmove.x;
+			g_EditWallInfo[g_Edit.nEditWallNumber].pos.z += g_Edit.Wallmove.z;
+			g_Edit.Wallmove *= 1.0f - DAMPING_COEFFICIENT;
 		}
 
 		//壁のサイズ変更
@@ -1439,6 +1552,8 @@ void SaveField(void)
 	//デバイスの取得
 	pDevice = GetDevice();
 
+	Camera* pCamera = GetCamera();
+
 	//Enemy* pEnemy = GetEnemy();
 	VERTEX_3D* pVtx;
 	g_pVtxBuffFieldEdit->Lock(0, 0, (void**)&pVtx, 0);
@@ -1446,21 +1561,38 @@ void SaveField(void)
 	//壁の情報変更
 	if (g_Edit.bCursorType == true)
 	{//プレス
-		if (GetKeyboardPress(DIK_W) == true)
-		{
-			g_EditFieldInfo[g_Edit.nEditFieldNumber].pos.z += MOVE_CURSOR;
+		D3DXVECTOR3 vecDirection(0.0f, 0.0f, 0.0f);
+		if (GetKeyboardPress(DIK_W) || GetJoypadPress(JOYKEY_UP))
+		{ // 上。
+			vecDirection.z += 1.0f;
 		}
-		if (GetKeyboardPress(DIK_S) == true)
+		if (GetKeyboardPress(DIK_A) || GetJoypadPress(JOYKEY_LEFT))
 		{
-			g_EditFieldInfo[g_Edit.nEditFieldNumber].pos.z -= MOVE_CURSOR;
+			vecDirection.x -= 1.0f;
 		}
-		if (GetKeyboardPress(DIK_A) == true)
+		if (GetKeyboardPress(DIK_D) || GetJoypadPress(JOYKEY_RIGHT))
 		{
-			g_EditFieldInfo[g_Edit.nEditFieldNumber].pos.x -= MOVE_CURSOR;
+			vecDirection.x += 1.0f;
 		}
-		if (GetKeyboardPress(DIK_D) == true)
+		if (GetKeyboardPress(DIK_S) || GetJoypadPress(JOYKEY_DOWN))
 		{
-			g_EditFieldInfo[g_Edit.nEditFieldNumber].pos.x += MOVE_CURSOR;
+			vecDirection.z -= 1.0f;
+		}
+
+		if (vecDirection.x == 0.0f && vecDirection.z == 0.0f)
+		{ // 動いてない。
+			g_Edit.Fieldmove.x = 0.0f;
+			g_Edit.Fieldmove.z = 0.0f;
+		}
+		else
+		{
+			float rotMoveY = pCamera->rot.y + atan2f(vecDirection.x, vecDirection.z);
+
+			g_Edit.Fieldmove.x += sinf(rotMoveY) * MOVE_CURSOR;
+			g_Edit.Fieldmove.z += cosf(rotMoveY) * MOVE_CURSOR;
+			g_EditFieldInfo[g_Edit.nEditFieldNumber].pos.x += g_Edit.Fieldmove.x;
+			g_EditFieldInfo[g_Edit.nEditFieldNumber].pos.z += g_Edit.Fieldmove.z;
+			g_Edit.Fieldmove *= 1.0f - DAMPING_COEFFICIENT;
 		}
 
 		//壁のサイズ変更
@@ -1514,21 +1646,38 @@ void SaveField(void)
 	}
 	else if (g_Edit.bCursorType == false)
 	{//トリガー
-		if (GetKeyboardTrigger(DIK_W) == true)
-		{
-			g_EditFieldInfo[g_Edit.nEditFieldNumber].pos.z += MOVE_CURSOR;
+		D3DXVECTOR3 vecDirection(0.0f, 0.0f, 0.0f);
+		if (GetKeyboardTrigger(DIK_W) || GetJoypadTrigger(JOYKEY_UP))
+		{ // 上。
+			vecDirection.z += 1.0f;
 		}
-		if (GetKeyboardTrigger(DIK_S) == true)
+		if (GetKeyboardTrigger(DIK_A) || GetJoypadTrigger(JOYKEY_LEFT))
 		{
-			g_EditFieldInfo[g_Edit.nEditFieldNumber].pos.z -= MOVE_CURSOR;
+			vecDirection.x -= 1.0f;
 		}
-		if (GetKeyboardTrigger(DIK_A) == true)
+		if (GetKeyboardTrigger(DIK_D) || GetJoypadTrigger(JOYKEY_RIGHT))
 		{
-			g_EditFieldInfo[g_Edit.nEditFieldNumber].pos.x -= MOVE_CURSOR;
+			vecDirection.x += 1.0f;
 		}
-		if (GetKeyboardTrigger(DIK_D) == true)
+		if (GetKeyboardTrigger(DIK_S) || GetJoypadTrigger(JOYKEY_DOWN))
 		{
-			g_EditFieldInfo[g_Edit.nEditFieldNumber].pos.x += MOVE_CURSOR;
+			vecDirection.z -= 1.0f;
+		}
+
+		if (vecDirection.x == 0.0f && vecDirection.z == 0.0f)
+		{ // 動いてない。
+			g_Edit.Fieldmove.x = 0.0f;
+			g_Edit.Fieldmove.z = 0.0f;
+		}
+		else
+		{
+			float rotMoveY = pCamera->rot.y + atan2f(vecDirection.x, vecDirection.z);
+
+			g_Edit.Fieldmove.x += sinf(rotMoveY) * MOVE_CURSOR;
+			g_Edit.Fieldmove.z += cosf(rotMoveY) * MOVE_CURSOR;
+			g_EditFieldInfo[g_Edit.nEditFieldNumber].pos.x += g_Edit.Fieldmove.x;
+			g_EditFieldInfo[g_Edit.nEditFieldNumber].pos.z += g_Edit.Fieldmove.z;
+			g_Edit.Fieldmove *= 1.0f - DAMPING_COEFFICIENT;
 		}
 
 		//壁のサイズ変更
@@ -1692,6 +1841,8 @@ void CorrectionField(void)
 	//デバイスの取得
 	pDevice = GetDevice();
 
+	Camera* pCamera = GetCamera();
+
 	//Enemy* pEnemy = GetEnemy();
 	VERTEX_3D* pVtx;
 	g_pVtxBuffFieldEdit->Lock(0, 0, (void**)&pVtx, 0);
@@ -1699,21 +1850,38 @@ void CorrectionField(void)
 	//壁の情報変更
 	if (g_Edit.bCursorType == true)
 	{//プレス
-		if (GetKeyboardPress(DIK_W) == true)
-		{
-			g_EditFieldInfo[g_Edit.nEditFieldNumber].pos.z += MOVE_CURSOR;
+		D3DXVECTOR3 vecDirection(0.0f, 0.0f, 0.0f);
+		if (GetKeyboardPress(DIK_W) || GetJoypadPress(JOYKEY_UP))
+		{ // 上。
+			vecDirection.z += 1.0f;
 		}
-		if (GetKeyboardPress(DIK_S) == true)
+		if (GetKeyboardPress(DIK_A) || GetJoypadPress(JOYKEY_LEFT))
 		{
-			g_EditFieldInfo[g_Edit.nEditFieldNumber].pos.z -= MOVE_CURSOR;
+			vecDirection.x -= 1.0f;
 		}
-		if (GetKeyboardPress(DIK_A) == true)
+		if (GetKeyboardPress(DIK_D) || GetJoypadPress(JOYKEY_RIGHT))
 		{
-			g_EditFieldInfo[g_Edit.nEditFieldNumber].pos.x -= MOVE_CURSOR;
+			vecDirection.x += 1.0f;
 		}
-		if (GetKeyboardPress(DIK_D) == true)
+		if (GetKeyboardPress(DIK_S) || GetJoypadPress(JOYKEY_DOWN))
 		{
-			g_EditFieldInfo[g_Edit.nEditFieldNumber].pos.x += MOVE_CURSOR;
+			vecDirection.z -= 1.0f;
+		}
+
+		if (vecDirection.x == 0.0f && vecDirection.z == 0.0f)
+		{ // 動いてない。
+			g_Edit.Fieldmove.x = 0.0f;
+			g_Edit.Fieldmove.z = 0.0f;
+		}
+		else
+		{
+			float rotMoveY = pCamera->rot.y + atan2f(vecDirection.x, vecDirection.z);
+
+			g_Edit.Fieldmove.x += sinf(rotMoveY) * MOVE_CURSOR;
+			g_Edit.Fieldmove.z += cosf(rotMoveY) * MOVE_CURSOR;
+			g_EditFieldInfo[g_Edit.nEditFieldNumber].pos.x += g_Edit.Fieldmove.x;
+			g_EditFieldInfo[g_Edit.nEditFieldNumber].pos.z += g_Edit.Fieldmove.z;
+			g_Edit.Fieldmove *= 1.0f - DAMPING_COEFFICIENT;
 		}
 
 		if (GetKeyboardTrigger(DIK_UP) == true)
@@ -1787,22 +1955,39 @@ void CorrectionField(void)
 	}
 	else if (g_Edit.bCursorType == false)
 	{//トリガー
-		if (GetKeyboardTrigger(DIK_W) == true)
-		{
-			g_EditFieldInfo[g_Edit.nEditFieldNumber].pos.z += MOVE_CURSOR;
-		}
-		if (GetKeyboardTrigger(DIK_S) == true)
-		{
-			g_EditFieldInfo[g_Edit.nEditFieldNumber].pos.z -= MOVE_CURSOR;
-		}
-		if (GetKeyboardTrigger(DIK_A) == true)
-		{
-			g_EditFieldInfo[g_Edit.nEditFieldNumber].pos.x -= MOVE_CURSOR;
-		}
-		if (GetKeyboardTrigger(DIK_D) == true)
-		{
-			g_EditFieldInfo[g_Edit.nEditFieldNumber].pos.x += MOVE_CURSOR;
-		}
+	D3DXVECTOR3 vecDirection(0.0f, 0.0f, 0.0f);
+	if (GetKeyboardTrigger(DIK_W) || GetJoypadPress(JOYKEY_UP))
+	{ // 上。
+		vecDirection.z += 1.0f;
+	}
+	if (GetKeyboardPress(DIK_A) || GetJoypadPress(JOYKEY_LEFT))
+	{
+		vecDirection.x -= 1.0f;
+	}
+	if (GetKeyboardPress(DIK_D) || GetJoypadPress(JOYKEY_RIGHT))
+	{
+		vecDirection.x += 1.0f;
+	}
+	if (GetKeyboardPress(DIK_S) || GetJoypadPress(JOYKEY_DOWN))
+	{
+		vecDirection.z -= 1.0f;
+	}
+
+	if (vecDirection.x == 0.0f && vecDirection.z == 0.0f)
+	{ // 動いてない。
+		g_Edit.Fieldmove.x = 0.0f;
+		g_Edit.Fieldmove.z = 0.0f;
+	}
+	else
+	{
+		float rotMoveY = pCamera->rot.y + atan2f(vecDirection.x, vecDirection.z);
+
+		g_Edit.Fieldmove.x += sinf(rotMoveY) * MOVE_CURSOR;
+		g_Edit.Fieldmove.z += cosf(rotMoveY) * MOVE_CURSOR;
+		g_EditFieldInfo[g_Edit.nEditFieldNumber].pos.x += g_Edit.Fieldmove.x;
+		g_EditFieldInfo[g_Edit.nEditFieldNumber].pos.z += g_Edit.Fieldmove.z;
+		g_Edit.Fieldmove *= 1.0f - DAMPING_COEFFICIENT;
+	}
 
 		//壁のサイズ変更
 		if (GetKeyboardTrigger(DIK_G) == true)
