@@ -354,7 +354,7 @@ void Update(void)
 		{
 			//カメラをゲーム視点に戻す
 			pCamera->type = CAMERATYPE_DEFAULT;
-			pCamera->posV = D3DXVECTOR3(0.0f, DEFAULT_LENGTH_Y, DEFAULT_LENGTH_Z); //視点
+			pCamera->posV = D3DXVECTOR3(0.0f, DEFAULT_LENGTH_Y, -DEFAULT_LENGTH_Z); //視点
 
 			//カーソルの表示を消す
 			pCursol->bUse = false;
@@ -365,7 +365,6 @@ void Update(void)
 		g_bReSave = g_bReSave ? false : true;
 		if (g_bReSave == true)
 		{
-			pCamera->posV = D3DXVECTOR3(0.0f, EDIT_LENGTH_Y, -EDIT_LENGTH_Z); //視点
 			reSaveModel();
 			reSaveWall();
 			reSaveField();
@@ -374,7 +373,6 @@ void Update(void)
 		{
 			//カメラをゲーム視点に戻す
 			pCamera->type = CAMERATYPE_DEFAULT;
-			pCamera->posV = D3DXVECTOR3(0.0f, DEFAULT_LENGTH_Y, DEFAULT_LENGTH_Z); //視点
 
 			//カーソルの表示を消す
 			pCursol->bUse = false;

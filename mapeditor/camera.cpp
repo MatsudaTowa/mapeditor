@@ -25,7 +25,7 @@ bool g_bType;
 //=============================================
 void InitCamera(void)
 {
-	g_Camera.posV = D3DXVECTOR3(0.0f, DEFAULT_LENGTH_Y, DEFAULT_LENGTH_Z); //視点
+	g_Camera.posV = D3DXVECTOR3(0.0f, DEFAULT_LENGTH_Y, -DEFAULT_LENGTH_Z); //視点
 	g_Camera.posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f); //注視
 	g_Camera.vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 	g_Camera.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -33,6 +33,7 @@ void InitCamera(void)
 	g_Camera.moveR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	g_Camera.rotmove = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	g_Camera.bEditFollow = false; //追従するかどうか
+	g_Camera.bCameraAngle = false; //カメラのアングル切り替え
 	g_Camera.type = CAMERATYPE_DEFAULT;
 
 	//対角線の長さを算出する
@@ -100,16 +101,21 @@ void UpdateCamera(void)
 		}
 	}
 	
-	if (GetKeyboardTrigger(DIK_F10) == true)
+	if (GetKeyboardTrigger(DIK_F8) == true)
 	{
-		if (g_Camera.type != CAMERATYPE_EDIT)
+		g_Camera.bCameraAngle = g_Camera.bCameraAngle ? false : true;
+		if (g_Camera.bCameraAngle == true)
 		{
-			g_Camera.type = CAMERATYPE_EDIT;
+			g_Camera.posV = D3DXVECTOR3(0.0f, DEFAULT_LENGTH_Y, -DEFAULT_LENGTH_Z); //視
+			g_Camera.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		}
-		else
+		else if (g_Camera.bCameraAngle == false)
 		{
-			g_Camera.type = CAMERATYPE_DEFAULT;
+			g_Camera.posV = D3DXVECTOR3(0.0f, EDIT_LENGTH_Y, -EDIT_LENGTH_Z); //視
+			g_Camera.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		}
+		D3DXVECTOR3 vecCamera = g_Camera.posR - g_Camera.posV;
+		g_Camera.fLength = sqrtf(vecCamera.y * vecCamera.y + vecCamera.z * vecCamera.z);
 	}
 
 	if (g_Camera.type == CAMERATYPE_DEFAULT)
@@ -176,7 +182,14 @@ void UpdateCamera(void)
 			g_Camera.rot.y-= 0.02f;
 
 			g_Camera.posV.x = g_Camera.posR.x - sinf(g_Camera.rot.y) * g_Camera.fLength;
-			g_Camera.posV.y = DEFAULT_LENGTH_Y;
+			if (g_Camera.bCameraAngle == true)
+			{
+				g_Camera.posV.y = DEFAULT_LENGTH_Y;
+			}
+			else if (g_Camera.bCameraAngle == false)
+			{
+				g_Camera.posV.y = EDIT_LENGTH_Y;
+			}
 			g_Camera.posV.z = g_Camera.posR.z - cosf(g_Camera.rot.y) * g_Camera.fLength;
 		}
 
@@ -185,23 +198,30 @@ void UpdateCamera(void)
 			g_Camera.rot.y += 0.02f;
 
 			g_Camera.posV.x = g_Camera.posR.x - sinf(g_Camera.rot.y) * g_Camera.fLength;
-			g_Camera.posV.y = DEFAULT_LENGTH_Y;
+			if (g_Camera.bCameraAngle == true)
+			{
+				g_Camera.posV.y = DEFAULT_LENGTH_Y;
+			}
+			else if (g_Camera.bCameraAngle == false)
+			{
+				g_Camera.posV.y = EDIT_LENGTH_Y;
+			}
 			g_Camera.posV.z = g_Camera.posR.z - cosf(g_Camera.rot.y) * g_Camera.fLength;
 		}
 
 
-		if (GetKeyboardPress(DIK_T) == true)
-		{
-			g_Camera.rot.x += 0.02f;
-			g_Camera.posR.y = g_Camera.posV.y + sinf(g_Camera.rot.x) * g_Camera.fLength;
-			g_Camera.posR.z = g_Camera.posV.z + cosf(g_Camera.rot.x) * g_Camera.fLength;
-		}
-		if (GetKeyboardPress(DIK_Y) == true)
-		{
-			g_Camera.rot.x -= 0.02f;
-			g_Camera.posR.y = g_Camera.posV.y + sinf(g_Camera.rot.x) * g_Camera.fLength;
-			g_Camera.posR.z = g_Camera.posV.z + cosf(g_Camera.rot.x) * g_Camera.fLength;
-		}
+		//if (GetKeyboardPress(DIK_T) == true)
+		//{
+		//	g_Camera.rot.x += 0.02f;
+		//	g_Camera.posR.y = g_Camera.posV.y + sinf(g_Camera.rot.x) * g_Camera.fLength;
+		//	g_Camera.posR.z = g_Camera.posV.z + cosf(g_Camera.rot.x) * g_Camera.fLength;
+		//}
+		//if (GetKeyboardPress(DIK_Y) == true)
+		//{
+		//	g_Camera.rot.x -= 0.02f;
+		//	g_Camera.posR.y = g_Camera.posV.y + sinf(g_Camera.rot.x) * g_Camera.fLength;
+		//	g_Camera.posR.z = g_Camera.posV.z + cosf(g_Camera.rot.x) * g_Camera.fLength;
+		//}
 	}
 
 	else if (g_Camera.type == CAMERATYPE_EDIT)
@@ -371,7 +391,7 @@ void DebagCameraPos(void)
 	RECT rect = { 0,0,SCREEN_WIDTH,SCREEN_HEIGHT };
 	char aStr[256];
 
-	sprintf(&aStr[0], "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n[カメラ情報]\nposV:%.1f,%.1f,%.1f\nposR:%.1f,%.1f,%.1f\nrot:%.1f,%.1f,%.1f"
+	sprintf(&aStr[0], "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n[カメラ情報]\nposV:%.1f,%.1f,%.1f\nposR:%.1f,%.1f,%.1f\nrot:%.1f,%.1f,%.1f\nF7:カーソルの追従（エディット時のみ） \nF8:カメラの視点変更"
 		, g_Camera.posV.x, g_Camera.posV.y, g_Camera.posV.z
 		,g_Camera.posR.x, g_Camera.posR.y, g_Camera.posR.z
 		,g_Camera.rot.x,g_Camera.rot.y,g_Camera.rot.z);
