@@ -56,8 +56,30 @@ float g_fFlash; //点滅
 //=============================================
 static const char* MODEL_NAME[NUM_MODEL] =
 {
-	"data\\MODEL\\iwa.x",
-	"data\\MODEL\\hyoshiki.x"
+	"data\\MODEL\\bath.x",
+	"data\\MODEL\\cactus.x",
+	"data\\MODEL\\cardboard.x",
+	"data\\MODEL\\Cupboard.x",
+	"data\\MODEL\\desk.x",
+	"data\\MODEL\\door.x",
+	"data\\MODEL\\flower pot.x",
+	"data\\MODEL\\garage.x",
+	"data\\MODEL\\key1.x",
+	"data\\MODEL\\key2.x",
+	"data\\MODEL\\key3.x",
+	"data\\MODEL\\kitchen.x",
+	"data\\MODEL\\metalshelf.x",
+	"data\\MODEL\\microwaveoven.x",
+	"data\\MODEL\\pot.x",
+	"data\\MODEL\\refrigerator.x",
+	"data\\MODEL\\slidedoor.x",
+	"data\\MODEL\\sofa.x",
+	"data\\MODEL\\stairs.x",
+	"data\\MODEL\\swollencactus.x",
+	"data\\MODEL\\toilet.x",
+	"data\\MODEL\\TV.x",
+	"data\\MODEL\\TVstand.x",
+	"data\\MODEL\\Washbasin.x",
 };
 
 //=============================================
@@ -212,12 +234,6 @@ void InitEdit(void)
 		pVtx[1].col = D3DCOLOR_RGBA(255, 255, 255, 255);
 		pVtx[2].col = D3DCOLOR_RGBA(255, 255, 255, 255);
 		pVtx[3].col = D3DCOLOR_RGBA(255, 255, 255, 255);
-
-		//テクスチャの座標指定
-		pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-		pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
-		pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-		pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
 
 		pVtx += 4;
 	}
@@ -567,7 +583,6 @@ void SaveModel(void)
 
 	//Enemy* pEnemy = GetEnemy();
 	VERTEX_3D* pVtx;
-	g_pVtxBuffWallEdit->Lock(0, 0, (void**)&pVtx, 0);
 
 	D3DXVECTOR3 vecDirection(0.0f, 0.0f, 0.0f);
 	if (GetKeyboardPress(DIK_W) || GetJoypadPress(JOYKEY_UP))
@@ -657,18 +672,8 @@ void SaveModel(void)
 		g_EditModelInfo[g_Edit.nEditModelNumber].bUseGame = true;
 		g_nSaveModelCnt++;
 		g_Edit.nEditModelNumber++;
-		//頂点カラーの設定
-		pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-		pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-		pVtx[2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-		pVtx[3].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
-	//頂点カラーの設定
-	pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlpha);
-	pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlpha);
-	pVtx[2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlpha);
-	pVtx[3].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlpha);
 
 	////テクスチャ座標の設定
 	//pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
@@ -2226,7 +2231,7 @@ void DrawEdit(void)
 						//pMat[nCntMat].MatD3D.Diffuse.a = 1.0f;
 					//}
 
-					//元の色に戻す
+					////元の色に戻す
 					//pMat[nCntMat].MatD3D.Diffuse = g_EditModelInfo[nCnt].Diffuse[nCntMat];
 					//マテリアルの設定
 					pDevice->SetMaterial(&pMat[nCntMat].MatD3D);

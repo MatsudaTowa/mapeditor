@@ -29,8 +29,30 @@ model g_aModel[MAX_MODEL];
 //=============================================
 static const char* MODEL_NAME[NUM_MODEL] =
 {
-	"data\\MODEL\\iwa.x",
-	"data\\MODEL\\hyoshiki.x"
+	"data\\MODEL\\bath.x",
+	"data\\MODEL\\cactus.x",
+	"data\\MODEL\\cardboard.x",
+	"data\\MODEL\\Cupboard.x",
+	"data\\MODEL\\desk.x",
+	"data\\MODEL\\door.x",
+	"data\\MODEL\\flower pot.x",
+	"data\\MODEL\\garage.x",
+	"data\\MODEL\\key1.x",
+	"data\\MODEL\\key2.x",
+	"data\\MODEL\\key3.x",
+	"data\\MODEL\\kitchen.x",
+	"data\\MODEL\\metalshelf.x",
+	"data\\MODEL\\microwaveoven.x",
+	"data\\MODEL\\pot.x",
+	"data\\MODEL\\refrigerator.x",
+	"data\\MODEL\\slidedoor.x",
+	"data\\MODEL\\sofa.x",
+	"data\\MODEL\\stairs.x",
+	"data\\MODEL\\swollencactus.x",
+	"data\\MODEL\\toilet.x",
+	"data\\MODEL\\TV.x",
+	"data\\MODEL\\TVstand.x",
+	"data\\MODEL\\Washbasin.x",
 };
 
 //=============================================
@@ -88,7 +110,7 @@ void InitModel(void)
 		g_aModel[nCnt].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f); //初期の方向
 		g_aModel[nCnt].move = D3DXVECTOR3(0.0f, 0.0f, 0.0f); //初期の移動速度
 		g_aModel[nCnt].nShadow = -1;
-		g_aModel[nCnt].nType = MODELTYPE_ROCK;
+		g_aModel[nCnt].nType = MODELTYPE_BATH;
 		g_aModel[nCnt].bUse = false;
 
 		//頂点バッファのロック
