@@ -18,7 +18,7 @@
 #define MOVE_CURSOR	(1.0f) //カーソル移動値
 #define CHANGE_SIZE	(5.0f) //壁のサイズ変更
 #define DAMPING_COEFFICIENT	(0.2f) //抵抗力
-#define TURN_SPEED	(0.1f) //回転
+#define TURN_SPEED	(0.05f) //回転
 
 //=============================================
 //グローバル変数
